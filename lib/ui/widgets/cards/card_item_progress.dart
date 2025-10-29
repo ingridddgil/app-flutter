@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CardItemProgress extends StatelessWidget {
-  final String title;
-  final String subtitle;
+  final String progressID;
+  final String supervisor;
   final Widget? actions;
+  final Widget? status;
 
   const CardItemProgress({
     super.key,
-    required this.title,
-    required this.subtitle,
+    required this.progressID,
+    required this.supervisor,
     this.actions,
+    this.status,
   });
 
   @override
@@ -20,22 +22,33 @@ class CardItemProgress extends StatelessWidget {
       color: Color(0xFFF1F2F4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 19, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (status != null) ...[
+              const SizedBox(height: 10),
+              status!
+            ],
+            SizedBox(height: 10),
             Text(
-              title,
-              style: GoogleFonts.montserrat(
+              progressID,
+              style: GoogleFonts.poppins(
                 color: Colors.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
               )
             ),
+            SizedBox(height: 1),
             Text(
-              subtitle,
-              style: GoogleFonts.montserrat(
-                color: Colors.grey[700],
+              supervisor,
+              style: GoogleFonts.poppins(
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 12,
               )
             ),
+            SizedBox(height: 4),
             if (actions != null) ...[
               const SizedBox(height: 10),
               actions!

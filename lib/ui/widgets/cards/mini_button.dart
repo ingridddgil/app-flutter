@@ -18,7 +18,7 @@ class MiniButton extends StatelessWidget {
   @override
   Widget build(BuildContext context){
     final style = OutlinedButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       minimumSize: Size.zero,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       side: BorderSide(color: color),
@@ -29,7 +29,7 @@ class MiniButton extends StatelessWidget {
         fontWeight: FontWeight.w500,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4)
+        borderRadius: BorderRadius.circular(7)
       ),
     );
       

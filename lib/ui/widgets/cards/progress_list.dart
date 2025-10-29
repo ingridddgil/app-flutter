@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'card_item_progress.dart';
 import 'mini_button.dart';
+import 'dart:math';
+import '../../../data/models/temp.dart';
+import 'status_tag.dart';
 
 class ProgressList extends StatelessWidget {
   const ProgressList({
@@ -9,13 +12,27 @@ class ProgressList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = List.generate(6, (i) => 'AVANCE 00${i + 1}'); // Example items
+    final random = Random();
+    final progressID = List.generate(6, (i) => 'A${random.nextInt(10000)}');
+    final supervisor = List.generate(6, (i) => supervisors[random.nextInt(supervisors.length)]);
+    final statusColors = [Colors.blue, Colors.green, Color(0xFFE2BC28)];
+    final statuses = ['Activo', 'Pendiente', 'Completado', 'Cancelado'];
+    final state = List.generate(6, (_) => statuses[random.nextInt(statusColors.length)]);
+    final project = List.generate(6, (i) => projectTitles[random.nextInt(projectTitles.length)]);
     return ListView.separated(
-      itemCount: items.length,
+      itemCount: projectTitles.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, i) => CardItemProgress(
-        title: items[i], 
-        subtitle: 'P0${i + 1} - Proyecto de ejemplo',
+        status: Column(
+          children: [
+             StatusTag(
+              color: statusColors[statuses.indexOf(state[i])],
+              status: _getStatusText(statusColors[statuses.indexOf(state[i])]),
+            ),
+          ],
+        ),
+        progressID: '${progressID[i]} - ${project[i]}',  
+        supervisor: supervisor[i],
         actions: Row(
           children: const [
             MiniButton(
@@ -31,5 +48,11 @@ class ProgressList extends StatelessWidget {
         ),
       ),
     );
+  }
+  String _getStatusText(Color color) {
+  if (color == Colors.blue) return 'Confirmado';
+  if (color == Colors.green) return 'Asignado';
+  if (color == Color(0xFFE2BC28)) return 'Borrador';
+  return '';
   }
 }

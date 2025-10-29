@@ -18,7 +18,7 @@ class StatusTag extends StatelessWidget{
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 13, vertical: 2),
+        padding: EdgeInsets.symmetric(horizontal: 9, vertical: 2),
         child: Text(
           status,
           style: GoogleFonts.montserrat(

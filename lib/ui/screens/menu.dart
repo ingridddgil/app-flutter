@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../widgets/circle_icon_button.dart'; 
 import '../widgets/tab_pill.dart';
-import '../widgets/cards/project_list.dart';
+import '../widgets/cards/task_list.dart';
 import '../widgets/cards/progress_list.dart';
+import '../widgets/cards/project_list.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -63,9 +64,14 @@ class _ProgressPage extends State<MenuPage> {
                   // Expanded (
                     // child: 
                     TabPill(
-                      text: 'Avances',
+                      text: 'Tareas',
                       active: sel == 1,
                       onTap: () => setState(() => sel = 1)
+                    ),
+                    TabPill(
+                      text: 'Avances',
+                      active: sel == 2,
+                      onTap: () => setState(() => sel = 2)
                     ),
                   // ),
 
@@ -86,12 +92,23 @@ class _ProgressPage extends State<MenuPage> {
               const SizedBox(height: 16),
 
               Expanded(
-                child: sel == 0 ? const ProjectList() : const ProgressList(),
+                child: 
+                  _buildContent(sel),
+                // sel == 0 ? const ProjectList() : const ProgressList(),
               ),
             ],
           ), 
         ),
       ),
     );
+  }
+  Widget _buildContent(int sel){
+    if (sel == 0) {
+      return const ProjectList();
+    } else if (sel == 1) {
+      return const TaskList(); // esta se cambia por la pantalla de tareas cuando haya
+    } else {
+      return const ProgressList();
+    }
   }
 }

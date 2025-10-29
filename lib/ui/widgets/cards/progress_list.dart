@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'card_item_progress.dart';
 import 'mini_button.dart';
 import 'dart:math';
@@ -23,16 +24,31 @@ class ProgressList extends StatelessWidget {
       itemCount: projectTitles.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, i) => CardItemProgress(
-        status: Column(
+
+        status: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             StatusTag(
+            Expanded(
+              child: Text(
+                progressID[i],
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.blue,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            StatusTag(
               color: statusColors[statuses.indexOf(state[i])],
               status: _getStatusText(statusColors[statuses.indexOf(state[i])]),
             ),
           ],
         ),
-        progressID: '${progressID[i]} - ${project[i]}',  
+        progressID: progressID[i], // DEBO QUITAR ESTA LÍNEA Y NO SÉ COMO 
         supervisor: supervisor[i],
+        projectID: project[i],
         actions: Row(
           children: const [
             MiniButton(

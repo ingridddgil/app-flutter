@@ -36,7 +36,7 @@ class CardItemProject extends StatelessWidget {
           children: [
             Text(
               title,
-              style: GoogleFonts.montserrat(
+              style: GoogleFonts.poppins(
                 color: Colors.black,
                 fontSize: 16,
                 fontWeight: FontWeight.w500
@@ -45,7 +45,7 @@ class CardItemProject extends StatelessWidget {
             SizedBox(height: 2),
             Text(
               subtitle,
-              style: GoogleFonts.montserrat(
+              style: GoogleFonts.poppins(
                 color: Colors.grey[700],
               )
             ),

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 class CardItemProgress extends StatelessWidget {
   final String progressID;
   final String supervisor;
+  final String projectID;
   final Widget? actions;
   final Widget? status;
 
@@ -11,6 +12,7 @@ class CardItemProgress extends StatelessWidget {
     super.key,
     required this.progressID,
     required this.supervisor,
+    required this.projectID,
     this.actions,
     this.status,
   });
@@ -46,6 +48,15 @@ class CardItemProgress extends StatelessWidget {
                 color: Colors.black,
                 fontWeight: FontWeight.normal,
                 fontSize: 12,
+              )
+            ),
+            SizedBox(height: 1),
+            Text(
+              projectID,
+              style: GoogleFonts.poppins(
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 10,
               )
             ),
             SizedBox(height: 4),

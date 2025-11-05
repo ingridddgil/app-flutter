@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
@@ -12,9 +13,10 @@ class GeneralPage extends StatefulWidget {
 class _GeneralPageState extends State<GeneralPage> {
   // form
   final _formKey = GlobalKey<FormState>();
-  final _ocPedidoCtrl = TextEditingController();
+  final _orderSaleCtrl = TextEditingController();
   final _obraCtrl = TextEditingController();
-  final _ctCtrl = TextEditingController();
+  final _workplaceCtrl = TextEditingController();
+  final _quoteNumber = TextEditingController();
   bool _isRFQ = false;
   String? _especialidad;
 
@@ -29,7 +31,7 @@ class _GeneralPageState extends State<GeneralPage> {
 
   // styles
   static const Color brand = Color(0xFF8B1E04); // botón / step activo
-  static const Color line  = Color(0xFFE5E5E5); // divisores / bordes suaves
+  static const Color line  = Color.fromARGB(255, 229, 229, 229); // divisores / bordes suaves
   static const double radius = 12;
 
   InputDecoration _inputDec(String label, {String? hint, Widget? suffixIcon}) {
@@ -38,7 +40,7 @@ class _GeneralPageState extends State<GeneralPage> {
       hintText: hint,
       filled: true,
       fillColor: const Color(0xFFF1F1F1),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: const BorderSide(color: line),
@@ -57,9 +59,9 @@ class _GeneralPageState extends State<GeneralPage> {
 
   @override
   void dispose() {
-    _ocPedidoCtrl.dispose();
+    _orderSaleCtrl.dispose();
     _obraCtrl.dispose();
-    _ctCtrl.dispose();
+    _workplaceCtrl.dispose();
     super.dispose();
   }
 
@@ -94,7 +96,7 @@ class _GeneralPageState extends State<GeneralPage> {
 
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                padding: const EdgeInsets.fromLTRB(6, 20, 6, 16),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -119,26 +121,28 @@ class _GeneralPageState extends State<GeneralPage> {
                           Text(
                             'Datos generales del trabajo',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 17,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Asegúrese de llenar correctamente el documento',
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.black.withOpacity(0.55),
-                                ),
+                              color: Colors.black.withOpacity(0.55),
+                              fontWeight: FontWeight.normal,
+                              ),
                           ),
                           const SizedBox(height: 16),
 
                           // OC/Pedido
                           TextFormField(
-                            controller: _ocPedidoCtrl,
+                            controller: _orderSaleCtrl,
                             decoration: _inputDec('OC/Pedido'),
                             validator: (v) =>
-                                (v == null || v.trim().isEmpty) ? 'Ingrese el OC/Pedido' : null,
+                                (v == null || v.trim().isEmpty) ? 'Ingrese la órden de venta o pedido' : null,
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 20),
 
                           // OR/RFQ + switch
                           Row(
@@ -147,16 +151,26 @@ class _GeneralPageState extends State<GeneralPage> {
                                 'OR/RFQ',
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
-                              const SizedBox(width: 8),
-                              Switch(
+                              const SizedBox(width: 15),
+                              CupertinoSwitch(
                                 value: _isRFQ,
                                 activeColor: brand,
                                 onChanged: (v) => setState(() => _isRFQ = v),
-                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+
+                                // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
+                              const SizedBox(width: 25),
+                              if (_isRFQ)
+                                Flexible(
+                                  child: TextFormField(
+                                    controller: _quoteNumber,
+                                    decoration: _inputDec('No. Cotización'),
+                                    validator: (v) => (v == null && _isRFQ) ? 'Ingrese el número de cotización' : null,
+                                  ),
+                                ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 20),
 
                           // Obra
                           TextFormField(
@@ -165,16 +179,16 @@ class _GeneralPageState extends State<GeneralPage> {
                             validator: (v) =>
                                 (v == null || v.trim().isEmpty) ? 'Ingrese la obra' : null,
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 25),
 
                           // CT
                           TextFormField(
-                            controller: _ctCtrl,
-                            decoration: _inputDec('CT'),
+                            controller: _workplaceCtrl,
+                            decoration: _inputDec('Centro de trabajo'),
                             validator: (v) =>
-                                (v == null || v.trim().isEmpty) ? 'Ingrese el CT' : null,
+                                (v == null || v.trim().isEmpty) ? 'Ingrese el centro de trabajo' : null,
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 25),
 
                           // Especialidad del trabajo (dropdown)
                           DropdownButtonFormField<String>(

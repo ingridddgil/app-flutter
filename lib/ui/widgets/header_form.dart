@@ -14,13 +14,13 @@ class Headerform extends StatelessWidget {
     this.onBack,
     this.activeColor,
     this.showDivider = true,
-    this.padding = const EdgeInsets.fromLTRB(16, 8, 16, 12),
+    this.padding = const EdgeInsets.fromLTRB(10, 8, 10, 5),
     this.titleStyle,
   });
 
   @override
   Widget build(BuildContext context){
-    final defaultTitleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700, height: 1.15,);
+    final defaultTitleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700, height: 1.15, color: Color(0xFF2E3A59), fontSize: 22);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -43,14 +43,12 @@ class Headerform extends StatelessWidget {
                 style: titleStyle ?? defaultTitleStyle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
+                
               ),
             ],
           ),
         ),
-        if (showDivider) const SizedBox(height: 8),
-        if (showDivider) const Divider(height: 1),
-        const SizedBox(height: 12),
-
+        if (showDivider) Padding(padding: padding, child: const Divider(height: 1)),
       ],
     );
   }

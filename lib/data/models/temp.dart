@@ -14,9 +14,9 @@ final List<String> clients = [
 ];
 
 final List<String> supervisors = [
-  'Juan Pérez', 
-  'María López', 
-  'Carlos Sánchez', 
-  'Ana Gómez', 
-  'Luis Rodríguez'
+  'Juan Solís Pérez', 
+  'María Sanchez López', 
+  'Carlos Herrera Sánchez', 
+  'Ana Zarate Gómez', 
+  'Luis Perez Rodríguez'
 ];

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/ui/widgets/form/progress/general.dart';
 import '../widgets/circle_icon_button.dart'; 
 import '../widgets/tab_pill.dart';
 import '../widgets/cards/task_list.dart';
@@ -80,12 +81,7 @@ class _ProgressPage extends State<MenuPage> {
                   const SizedBox(width: 8),
                   CircleIconButton(
                     icon: Icons.add,
-                    onTap: () {
-                      final msg = sel == 0 ? 'Nuevo proyecto' : 'Nuevo avance';
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(msg)),
-                      );
-                    },
+                    onTap: () => setState(() => sel = 3),
                   ),
                 ],
               ),
@@ -107,8 +103,10 @@ class _ProgressPage extends State<MenuPage> {
       return const ProjectList();
     } else if (sel == 1) {
       return const TaskList(); // esta se cambia por la pantalla de tareas cuando haya
-    } else {
+    } else if (sel == 2) {
       return const ProgressList();
-    }
+    } else /* if (sel == 3) */ { 
+      return const GeneralPage();
+    } 
   }
 }

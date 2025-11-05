@@ -34,7 +34,7 @@ class ProgressList extends StatelessWidget {
                 progressID[i],
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: Colors.blue,
+                  color: Colors.black,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -46,7 +46,8 @@ class ProgressList extends StatelessWidget {
             ),
           ],
         ),
-        progressID: progressID[i], // DEBO QUITAR ESTA LÍNEA Y NO SÉ COMO 
+
+        // progressID: progressID[i], // DEBO QUITAR ESTA LÍNEA Y NO SÉ COMO 
         supervisor: supervisor[i],
         projectID: project[i],
         actions: Row(

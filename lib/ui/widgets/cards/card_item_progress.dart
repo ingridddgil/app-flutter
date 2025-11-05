@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CardItemProgress extends StatelessWidget {
-  final String progressID;
+  // final String progressID;
   final String supervisor;
   final String projectID;
   final Widget? actions;
@@ -10,7 +10,7 @@ class CardItemProgress extends StatelessWidget {
 
   const CardItemProgress({
     super.key,
-    required this.progressID,
+    // required this.progressID,
     required this.supervisor,
     required this.projectID,
     this.actions,
@@ -33,14 +33,14 @@ class CardItemProgress extends StatelessWidget {
               status!
             ],
             SizedBox(height: 10),
-            Text(
-              progressID,
-              style: GoogleFonts.poppins(
-                color: Colors.black,
-                fontWeight: FontWeight.normal,
-                fontSize: 14,
-              )
-            ),
+            // Text(
+            //   progressID,
+            //   style: GoogleFonts.poppins(
+            //     color: Colors.black,
+            //     fontWeight: FontWeight.normal,
+            //     fontSize: 14,
+            //   )
+            // ),
             SizedBox(height: 1),
             Text(
               supervisor,

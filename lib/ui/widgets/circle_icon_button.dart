@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 class CircleIconButton extends StatelessWidget{
   final IconData icon;
-  final VoidCallback onTap;
+  final VoidCallback onPressed;
 
   const CircleIconButton(
     {super.key,
     required this.icon,
-    required this.onTap
+    required this.onPressed
     }
   );
 
   @override 
   Widget build(BuildContext context){
     return InkResponse(
-      onTap: onTap,
+      onTap: onPressed,
       radius: 24,
       child: Container(
         width: 36,

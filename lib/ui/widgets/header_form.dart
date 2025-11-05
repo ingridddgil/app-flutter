@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Headerform extends StatelessWidget {
   final String title;
@@ -14,13 +15,12 @@ class Headerform extends StatelessWidget {
     this.onBack,
     this.activeColor,
     this.showDivider = true,
-    this.padding = const EdgeInsets.fromLTRB(10, 8, 10, 5),
+    this.padding = const EdgeInsets.fromLTRB(20, 10, 20, 5),
     this.titleStyle,
   });
 
   @override
   Widget build(BuildContext context){
-    final defaultTitleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700, height: 1.15, color: Color(0xFF2E3A59), fontSize: 22);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -30,20 +30,46 @@ class Headerform extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (onBack != null)
-                IconButton(
-                  onPressed: onBack,
-                  icon: const Icon(Icons.arrow_back_ios),
-                  color: activeColor ?? Theme.of(context).iconTheme.color,
-                  tooltip: 'Regresar',
-                ),
-              // título
-              Text(
-                title,
-                style: titleStyle ?? defaultTitleStyle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: onBack != null
+                            ? IconButton(
+                                onPressed: onBack,
+                                icon: const Icon(Icons.arrow_back_ios),
+                                color: const Color(0xFF8B1E04),
+                              )
+                            : const Icon(
+                                Icons.arrow_back_ios,
+                                color: Color(0xFF8B1E04),
+                              ),
+                      ),
+                      Text(
+                          'Regresar',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400
+                          ),
+                        ),
+                    ], 
+                  ),           
+                  SizedBox(height: 35),
+                  // título
+                  Text(
+                    title,
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.w700, 
+                      height: 1.15, 
+                      color: Color(0xFF2E3A59), 
+                      fontSize: 20
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ],
           ),

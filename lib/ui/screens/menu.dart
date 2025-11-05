@@ -75,13 +75,16 @@ class _ProgressPage extends State<MenuPage> {
                       onTap: () => setState(() => sel = 2)
                     ),
                   // ),
+                  // const SizedBox(width: 8),
 
-
-
-                  const SizedBox(width: 8),
                   CircleIconButton(
                     icon: Icons.add,
-                    onTap: () => setState(() => sel = 3),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const GeneralPage())
+                      );
+                    },
                   ),
                 ],
               ),
@@ -103,10 +106,10 @@ class _ProgressPage extends State<MenuPage> {
       return const ProjectList();
     } else if (sel == 1) {
       return const TaskList(); // esta se cambia por la pantalla de tareas cuando haya
-    } else if (sel == 2) {
+    } else {
       return const ProgressList();
-    } else /* if (sel == 3) */ { 
+    } /* else if (sel == 3)  { 
       return const GeneralPage();
-    } 
+    } */
   }
 }

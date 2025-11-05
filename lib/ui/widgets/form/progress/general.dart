@@ -96,7 +96,7 @@ class _GeneralPageState extends State<GeneralPage> {
 
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(6, 20, 6, 16),
+                padding: const EdgeInsets.fromLTRB(13, 20, 13, 16),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(16),

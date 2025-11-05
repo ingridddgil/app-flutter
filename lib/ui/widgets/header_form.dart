@@ -56,7 +56,7 @@ class Headerform extends StatelessWidget {
                         ),
                     ], 
                   ),           
-                  SizedBox(height: 35),
+                  SizedBox(height: 30),
                   // título
                   Text(
                     title,

@@ -165,7 +165,11 @@ class _GeneralPageState extends State<GeneralPage> {
                                   child: TextFormField(
                                     controller: _quoteNumber,
                                     decoration: _inputDec('No. Cotización'),
-                                    validator: (v) => (v == null && _isRFQ) ? 'Ingrese el número de cotización' : null,
+                                    validator: (v) { if (_isRFQ && (v == null || v.trim().isEmpty)) {
+                                      return 'Ingrese el número de cotización';
+                                    }
+                                    return null;
+                                    },
                                   ),
                                 ),
                             ],

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
+import '../../../styles/progress_bar_form_theme.dart';
+import 'description.dart';
 
 class GeneralPage extends StatefulWidget {
   const GeneralPage({super.key});
@@ -29,33 +31,6 @@ class _GeneralPageState extends State<GeneralPage> {
     StepItem(icon: Icons.warning_amber, label: 'Contratiempos'),
   ];
 
-  // styles
-  static const Color brand = Color(0xFF8B1E04); // botón / step activo
-  static const Color line  = Color.fromARGB(255, 229, 229, 229); // divisores / bordes suaves
-  static const double radius = 12;
-
-  InputDecoration _inputDec(String label, {String? hint, Widget? suffixIcon}) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      filled: true,
-      fillColor: const Color(0xFFF1F1F1),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: line),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: line),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: brand, width: 1.5),
-      ),
-      suffixIcon: suffixIcon,
-    );
-  }
 
   @override
   void dispose() {
@@ -70,7 +45,10 @@ class _GeneralPageState extends State<GeneralPage> {
     if (!ok) return;
     _formKey.currentState?.save();
     // TODO: navega a la siguiente pantalla de tu flujo
-    // Navigator.push(...);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const DescriptionPage()),
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Formulario válido. Continuando…')),
     );
@@ -138,7 +116,7 @@ class _GeneralPageState extends State<GeneralPage> {
                           // OC/Pedido
                           TextFormField(
                             controller: _orderSaleCtrl,
-                            decoration: _inputDec('OC/Pedido'),
+                            decoration: inputDec('OC/Pedido'),
                             validator: (v) =>
                                 (v == null || v.trim().isEmpty) ? 'Ingrese la órden de venta o pedido' : null,
                           ),
@@ -164,7 +142,7 @@ class _GeneralPageState extends State<GeneralPage> {
                                 Flexible(
                                   child: TextFormField(
                                     controller: _quoteNumber,
-                                    decoration: _inputDec('No. Cotización'),
+                                    decoration: inputDec('No. Cotización'),
                                     validator: (v) { if (_isRFQ && (v == null || v.trim().isEmpty)) {
                                       return 'Ingrese el número de cotización';
                                     }
@@ -179,7 +157,7 @@ class _GeneralPageState extends State<GeneralPage> {
                           // Obra
                           TextFormField(
                             controller: _obraCtrl,
-                            decoration: _inputDec('Obra'),
+                            decoration: inputDec('Obra'),
                             validator: (v) =>
                                 (v == null || v.trim().isEmpty) ? 'Ingrese la obra' : null,
                           ),
@@ -188,7 +166,7 @@ class _GeneralPageState extends State<GeneralPage> {
                           // CT
                           TextFormField(
                             controller: _workplaceCtrl,
-                            decoration: _inputDec('Centro de trabajo'),
+                            decoration: inputDec('Centro de trabajo'),
                             validator: (v) =>
                                 (v == null || v.trim().isEmpty) ? 'Ingrese el centro de trabajo' : null,
                           ),
@@ -197,7 +175,7 @@ class _GeneralPageState extends State<GeneralPage> {
                           // Especialidad del trabajo (dropdown)
                           DropdownButtonFormField<String>(
                             value: _especialidad,
-                            decoration: _inputDec('Especialidad del trabajo'),
+                            decoration: inputDec('Especialidad del trabajo'),
                             items: const [
                               DropdownMenuItem(value: 'Civil', child: Text('Civil')),
                               DropdownMenuItem(value: 'Eléctrica', child: Text('Eléctrica')),

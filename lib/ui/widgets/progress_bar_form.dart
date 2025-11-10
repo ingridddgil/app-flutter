@@ -57,7 +57,7 @@ class StepProgressBar extends StatelessWidget {
 
     final circleFill = (isActive || isCompleted) ? activeColor : Colors.white;
     final circleBorder = (isActive || isCompleted) ? activeColor : inactiveColor;
-    final iconColor = isActive ? Colors.white : inactiveTextColor;
+    final iconColor = (isActive || isCompleted) ? Colors.white : inactiveTextColor;
     final labelColor = isActive ? activeTextColor : inactiveTextColor;
 
     final textStyle = (labelTextStyle ??

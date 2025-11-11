@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class ProgressBar extends StatelessWidget {
   final double progress;
+  final double height;
 
   const  ProgressBar({
     super.key,
     required this.progress,
+    this.height = 4,
     });
 
   @override 
@@ -24,7 +26,7 @@ class ProgressBar extends StatelessWidget {
            ),
           LinearProgressIndicator(
             value: progress,
-            minHeight: 4,
+            minHeight: height,
             color: Color(0xFF8B1E04),
             backgroundColor: Colors.grey[300],
             borderRadius: BorderRadius.circular(8),

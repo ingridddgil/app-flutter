@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
+import 'general.dart';
+import 'progress_details.dart';
 
 class DescriptionPage extends StatefulWidget {
   const DescriptionPage({super.key});
@@ -52,14 +54,20 @@ class _DescriptionPageState extends State<DescriptionPage> {
     final workArea = _workArea.text.trim();
     final license = _license.text.trim();
 
-    //Navigator.push();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProgressDetailsPage()),
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Formulario válido.')),
     );
   }
 
   void _back(){
-    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const GeneralPage()),
+    );
   }
 
   @override
@@ -103,7 +111,7 @@ class _DescriptionPageState extends State<DescriptionPage> {
                         children: [
                           // titulo  y subtitulo del formulario
                           Text(
-                            'Datos generales del trabajo',
+                            'Descripción detallada del trabajo',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.normal,
                               fontSize: 17,
@@ -199,7 +207,7 @@ class _DescriptionPageState extends State<DescriptionPage> {
 
                           TextFormField(
                             controller: _license,
-                            decoration: inputDec('Licencia ambiental'),
+                            decoration: inputDec('Licencia/OM'),
                             validator: (v) => (v == null || v.trim().isEmpty) ? 'Ingrese la licencia ambiental' : null,
                           ),  
                           SizedBox(height: 25),

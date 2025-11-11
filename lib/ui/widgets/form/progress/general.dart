@@ -31,12 +31,12 @@ class _GeneralPageState extends State<GeneralPage> {
     StepItem(icon: Icons.warning_amber, label: 'Contratiempos'),
   ];
 
-
   @override
   void dispose() {
     _orderSaleCtrl.dispose();
     _obraCtrl.dispose();
     _workplaceCtrl.dispose();
+    _quoteNumber.dispose();
     super.dispose();
   }
 
@@ -44,7 +44,6 @@ class _GeneralPageState extends State<GeneralPage> {
     final ok = _formKey.currentState?.validate() ?? false;
     if (!ok) return;
     _formKey.currentState?.save();
-    // TODO: navega a la siguiente pantalla de tu flujo
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const DescriptionPage()),
@@ -61,15 +60,12 @@ class _GeneralPageState extends State<GeneralPage> {
       body: SafeArea(
         child: Column(
           children: [
-            Headerform(
-              title: 'Bitácora de actividades diarias por servicio'
-            ),
+            Headerform(title: 'Bitácora de actividades diarias por servicio'),
             StepProgressBar(
               steps: steps,
               currentIndex: 0,
               activeColor: brand,
               inactiveColor: line,
-        
             ),
 
             Expanded(
@@ -80,7 +76,7 @@ class _GeneralPageState extends State<GeneralPage> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: line),
+                      // border: Border.all(color: line),
                       borderRadius: BorderRadius.circular(radius),
                       boxShadow: [
                         BoxShadow(
@@ -107,23 +103,36 @@ class _GeneralPageState extends State<GeneralPage> {
                           Text(
                             'Asegúrese de llenar correctamente el documento',
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.black.withOpacity(0.55),
-                              fontWeight: FontWeight.normal,
-                              ),
+                                  color: Colors.black.withOpacity(0.55),
+                                  fontWeight: FontWeight.normal,
+                                ),
                           ),
                           const SizedBox(height: 16),
 
-                          // OC/Pedido
-                          TextFormField(
-                            controller: _orderSaleCtrl,
-                            decoration: inputDec('OC/Pedido'),
-                            validator: (v) =>
-                                (v == null || v.trim().isEmpty) ? 'Ingrese la órden de venta o pedido' : null,
+                          // OC/Pedido (label arriba + sombra)
+                          const Text(
+                            'OC/Pedido',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF4A4A4A),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          fieldContainer(
+                            child: TextFormField(
+                              controller: _orderSaleCtrl,
+                              decoration: inputDec('OC/Pedido'),
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'Ingrese la órden de venta o pedido'
+                                  : null,
+                            ),
                           ),
                           const SizedBox(height: 20),
 
-                          // OR/RFQ + switch
+                          // OR/RFQ + switch + (opcional) No. Cotización
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'OR/RFQ',
@@ -134,20 +143,35 @@ class _GeneralPageState extends State<GeneralPage> {
                                 value: _isRFQ,
                                 activeColor: brand,
                                 onChanged: (v) => setState(() => _isRFQ = v),
-
-                                // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               const SizedBox(width: 25),
                               if (_isRFQ)
                                 Flexible(
-                                  child: TextFormField(
-                                    controller: _quoteNumber,
-                                    decoration: inputDec('No. Cotización'),
-                                    validator: (v) { if (_isRFQ && (v == null || v.trim().isEmpty)) {
-                                      return 'Ingrese el número de cotización';
-                                    }
-                                    return null;
-                                    },
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'No. Cotización',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF4A4A4A),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      fieldContainer(
+                                        child: TextFormField(
+                                          controller: _quoteNumber,
+                                          decoration: inputDec('No. Cotización'),
+                                          validator: (v) {
+                                            if (_isRFQ && (v == null || v.trim().isEmpty)) {
+                                              return 'Ingrese el número de cotización';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                             ],
@@ -155,35 +179,69 @@ class _GeneralPageState extends State<GeneralPage> {
                           const SizedBox(height: 20),
 
                           // Obra
-                          TextFormField(
-                            controller: _obraCtrl,
-                            decoration: inputDec('Obra'),
-                            validator: (v) =>
-                                (v == null || v.trim().isEmpty) ? 'Ingrese la obra' : null,
+                          const Text(
+                            'Obra',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF4A4A4A),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          fieldContainer(
+                            child: TextFormField(
+                              controller: _obraCtrl,
+                              decoration: inputDec('Obra'),
+                              validator: (v) =>
+                                  (v == null || v.trim().isEmpty) ? 'Ingrese la obra' : null,
+                            ),
                           ),
                           const SizedBox(height: 25),
 
-                          // CT
-                          TextFormField(
-                            controller: _workplaceCtrl,
-                            decoration: inputDec('Centro de trabajo'),
-                            validator: (v) =>
-                                (v == null || v.trim().isEmpty) ? 'Ingrese el centro de trabajo' : null,
+                          // Centro de trabajo
+                          const Text(
+                            'Centro de trabajo',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF4A4A4A),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          fieldContainer(
+                            child: TextFormField(
+                              controller: _workplaceCtrl,
+                              decoration: inputDec('Centro de trabajo'),
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'Ingrese el centro de trabajo'
+                                  : null,
+                            ),
                           ),
                           const SizedBox(height: 25),
 
-                          // Especialidad del trabajo (dropdown)
-                          DropdownButtonFormField<String>(
-                            value: _especialidad,
-                            decoration: inputDec('Especialidad del trabajo'),
-                            items: const [
-                              DropdownMenuItem(value: 'Civil', child: Text('Civil')),
-                              DropdownMenuItem(value: 'Eléctrica', child: Text('Eléctrica')),
-                              DropdownMenuItem(value: 'Mecánica', child: Text('Mecánica')),
-                              DropdownMenuItem(value: 'Instrumentación', child: Text('Instrumentación')),
-                            ],
-                            onChanged: (v) => setState(() => _especialidad = v),
-                            validator: (v) => v == null ? 'Seleccione una especialidad' : null,
+                          // Especialidad del trabajo (dropdown) con mismo estilo
+                          const Text(
+                            'Especialidad del trabajo',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF4A4A4A),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          fieldContainer(
+                            child: DropdownButtonFormField<String>(
+                              value: _especialidad,
+                              decoration: inputDec('Especialidad del trabajo'),
+                              items: const [
+                                DropdownMenuItem(value: 'Civil', child: Text('Civil')),
+                                DropdownMenuItem(value: 'Eléctrica', child: Text('Eléctrica')),
+                                DropdownMenuItem(value: 'Mecánica', child: Text('Mecánica')),
+                                DropdownMenuItem(value: 'Instrumentación', child: Text('Instrumentación')),
+                              ],
+                              onChanged: (v) => setState(() => _especialidad = v),
+                              validator: (v) => v == null ? 'Seleccione una especialidad' : null,
+                            ),
                           ),
                         ],
                       ),

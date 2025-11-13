@@ -4,9 +4,11 @@ import 'package:flutter_demo/ui/widgets/progress_bar.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
+import '../../../../data/models/progress_details_form.dart';
 
 class ProgressDetailsPage extends StatefulWidget {
-  const ProgressDetailsPage({super.key});
+  final ProgressDetailsData? initial;
+  const ProgressDetailsPage({super.key, this.initial});
 
   @override
   State<ProgressDetailsPage> createState() => _ProgressDetailsPageState();
@@ -36,6 +38,10 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
     StepItem(icon: Icons.warning_amber, label: 'Contratiempos'),
   ];
 
+  double _toDoubleSafely(String value) {
+    return double.tryParse(value.replaceAll(',', '.')) ?? 0.0;
+  }
+
   @override
   void dispose() {
     _taskCtrl.dispose();
@@ -50,8 +56,31 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
   }
 
   void _submit() {
-    final ok = _formKey.currentState?.validate() ?? false;
-    if (!ok) return;
+    // final ok = _formKey.currentState?.validate() ?? false;
+    // if (!ok) return;
+
+    final executed = _toDoubleSafely(_quantityExecutedCtrl.text);
+    final requested = _toDoubleSafely(_quantityRequestedCtrl.text);      
+    final remaining = _toDoubleSafely(_quantityRemainingCtrl.text);
+    final amountTotal = _toDoubleSafely(_amountTotalCtrl.text);
+    final amountRemaining = _toDoubleSafely(_amountRemainingCtrl.text);
+    final amountDisbursed = _toDoubleSafely(_amountDisbursedCtrl.text);
+
+    final data = ProgressDetailsData(
+      task: _taskCtrl.text.trim(),
+      detail: _detailCtrl.text.trim(),
+      quantityExecuted: executed,
+      quantityRequested: requested,
+      quantityRemaining: remaining,
+      amountTotal: amountTotal,
+      amountRemaining: amountRemaining,
+      amountDisbursed: amountDisbursed,
+      percentageProgress: _percentageProgress,
+      cumulativePercentage: _cumulativePercentageCtrl,
+    );
+
+    Navigator.pop(context,data);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Formulario válido.')),
     );
@@ -67,6 +96,20 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
   @override 
   void initState() {
     super.initState();
+
+    final d = widget.initial;
+    if (d != null) {
+      _taskCtrl.text = d.task;
+      _detailCtrl.text = d.detail;
+      _quantityExecutedCtrl.text = d.quantityExecuted.toString();
+      _quantityRequestedCtrl.text = d.quantityRequested.toString();
+      _quantityRemainingCtrl.text = d.quantityRemaining.toString();
+      _amountTotalCtrl.text = d.amountTotal.toString();
+      _amountRemainingCtrl.text = d.amountRemaining.toString();
+      _amountDisbursedCtrl.text = d.amountDisbursed.toString();
+      _percentageProgress = d.percentageProgress;
+      _cumulativePercentageCtrl = d.cumulativePercentage;
+    }
     _quantityExecutedCtrl.addListener(_recalculateProgress);
     _quantityRequestedCtrl.addListener(_recalculateProgress);
   }
@@ -80,11 +123,6 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
       _percentageProgress = clamped;
     });
   }
-
-  double _toDoubleSafely(String value) {
-    return double.tryParse(value.replaceAll(',', '.')) ?? 0.0;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,16 +163,16 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                         children: [
                           Text(
                             'Detalles del avance',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.normal,
                               fontSize: 17,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
 
                           Text(
                             'Asegúrese de llenar correctamente el formulario',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.black.withOpacity(0.55),
                               fontWeight: FontWeight.normal,
                             ),
@@ -142,13 +180,9 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                           const SizedBox(height: 16),
 
                           // --- Tarea / Partida ---
-                          const Text(
+                          Text(
                             'Tarea/ Partida',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF4A4A4A),
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 6),
                           fieldContainer(
@@ -164,13 +198,9 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                           const SizedBox(height: 16),
 
                           // --- Detalle del avance ---
-                          const Text(
+                          Text(
                             'Detalle del avance',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF4A4A4A),
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 6),
                           fieldContainer(
@@ -192,13 +222,9 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Cantidad ejecutada',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF4A4A4A),
-                                      ),
+                                      style: Theme.of(context).textTheme.bodyLarge,
                                     ),
                                     const SizedBox(height: 6),
                                     fieldContainer(
@@ -220,13 +246,9 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Monto total',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF4A4A4A),
-                                      ),
+                                      style: Theme.of(context).textTheme.bodyLarge,
                                     ),
                                     const SizedBox(height: 6),
                                     fieldContainer(
@@ -253,13 +275,9 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Cantidad solicitada',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF4A4A4A),
-                                      ),
+                                      style: Theme.of(context).textTheme.bodyLarge,
                                     ),
                                     const SizedBox(height: 6),
                                     fieldContainer(
@@ -281,13 +299,9 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Monto entregado',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF4A4A4A),
-                                      ),
+                                      style: Theme.of(context).textTheme.bodyLarge,
                                     ),
                                     const SizedBox(height: 6),
                                     fieldContainer(
@@ -315,13 +329,9 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Cantidad restante',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF4A4A4A),
-                                      ),
+                                      style: Theme.of(context).textTheme.bodyLarge,
                                     ),
                                     const SizedBox(height: 6),
                                     fieldContainer(
@@ -343,13 +353,9 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Monto faltante',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF4A4A4A),
-                                      ),
+                                      style: Theme.of(context).textTheme.bodyLarge,
                                     ),
                                     const SizedBox(height: 6),
                                     fieldContainer(

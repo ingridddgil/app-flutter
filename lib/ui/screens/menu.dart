@@ -2,19 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo/ui/widgets/form/progress/general.dart';
 import '../widgets/circle_icon_button.dart'; 
 import '../widgets/tab_pill.dart';
-import '../widgets/cards/task_list.dart';
-import '../widgets/cards/progress_list.dart';
-import '../widgets/cards/project_list.dart';
+import '../widgets/cards/task_list_menu.dart';
+import '../widgets/cards/progress_list_menu.dart';
+import '../widgets/cards/project_list_menu.dart';
 
 class MenuPage extends StatefulWidget {
-  const MenuPage({super.key});
+  final int initialTab;
+  const MenuPage({super.key, this.initialTab = 0});
 
   @override
   State<MenuPage> createState() => _ProgressPage();
 }
 
 class _ProgressPage extends State<MenuPage> {
-  int sel = 0; // 0 proyectos, 1 avances,
+  late int sel; // 0 proyectos, 1 avances,
+
+  @override
+  void initState() {
+    super.initState();
+    sel = widget.initialTab;
+  }
 
   @override
   Widget build(BuildContext context) {

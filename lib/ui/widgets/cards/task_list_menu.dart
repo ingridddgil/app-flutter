@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'card_item_task.dart';
+import 'item_task.dart';
 import 'dart:math';
 import '../progress_bar.dart';
 import '../../../data/models/temp.dart';

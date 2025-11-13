@@ -41,9 +41,9 @@ class _GeneralPageState extends State<GeneralPage> {
   }
 
   void _submit() {
-    final ok = _formKey.currentState?.validate() ?? false;
-    if (!ok) return;
-    _formKey.currentState?.save();
+    // final ok = _formKey.currentState?.validate() ?? false;
+    // if (!ok) return;
+    // _formKey.currentState?.save();
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const DescriptionPage()),
@@ -94,7 +94,7 @@ class _GeneralPageState extends State<GeneralPage> {
                           // Título y subtítulo del bloque
                           Text(
                             'Datos generales del trabajo',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.normal,
                                   fontSize: 17,
                                 ),
@@ -102,7 +102,7 @@ class _GeneralPageState extends State<GeneralPage> {
                           const SizedBox(height: 4),
                           Text(
                             'Asegúrese de llenar correctamente el documento',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Colors.black.withOpacity(0.55),
                                   fontWeight: FontWeight.normal,
                                 ),
@@ -110,13 +110,9 @@ class _GeneralPageState extends State<GeneralPage> {
                           const SizedBox(height: 16),
 
                           // OC/Pedido (label arriba + sombra)
-                          const Text(
+                          Text(
                             'OC/Pedido',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF4A4A4A),
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 6),
                           fieldContainer(
@@ -136,7 +132,7 @@ class _GeneralPageState extends State<GeneralPage> {
                             children: [
                               Text(
                                 'OR/RFQ',
-                                style: Theme.of(context).textTheme.bodyMedium,
+                                style: Theme.of(context).textTheme.bodyLarge,
                               ),
                               const SizedBox(width: 15),
                               CupertinoSwitch(
@@ -150,13 +146,9 @@ class _GeneralPageState extends State<GeneralPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'No. Cotización',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF4A4A4A),
-                                        ),
+                                        style: Theme.of(context).textTheme.bodyLarge,
                                       ),
                                       const SizedBox(height: 6),
                                       fieldContainer(
@@ -179,13 +171,9 @@ class _GeneralPageState extends State<GeneralPage> {
                           const SizedBox(height: 20),
 
                           // Obra
-                          const Text(
+                          Text(
                             'Obra',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF4A4A4A),
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 6),
                           fieldContainer(
@@ -199,13 +187,9 @@ class _GeneralPageState extends State<GeneralPage> {
                           const SizedBox(height: 25),
 
                           // Centro de trabajo
-                          const Text(
+                          Text(
                             'Centro de trabajo',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF4A4A4A),
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 6),
                           fieldContainer(
@@ -220,13 +204,9 @@ class _GeneralPageState extends State<GeneralPage> {
                           const SizedBox(height: 25),
 
                           // Especialidad del trabajo (dropdown) con mismo estilo
-                          const Text(
+                          Text(
                             'Especialidad del trabajo',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF4A4A4A),
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 6),
                           fieldContainer(

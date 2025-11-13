@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/ui/widgets/form/progress/personnel.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
-import 'general.dart';
-import 'progress_activity.dart';
+import '../../../screens/menu.dart';
 
-class DescriptionPage extends StatefulWidget {
-  const DescriptionPage({super.key});
+class IssuesPage extends StatefulWidget {
+  const IssuesPage({super.key});
 
   @override
-  State<DescriptionPage> createState() => _DescriptionPageState();
+  State<IssuesPage> createState() => _IssuesPageState();
 }
 
-class _DescriptionPageState extends State<DescriptionPage> {
+class _IssuesPageState extends State<IssuesPage> {
   // Description form
   final _formKey = GlobalKey<FormState>();
-  final _companyPremises = TextEditingController();
   final _startTime = TextEditingController();
   final _endTime = TextEditingController();
-  final _clientSupervisor = TextEditingController();
-  final _supervisor = TextEditingController();
-  final _workArea = TextEditingController();
-  final _license = TextEditingController();
+  final _description = TextEditingController();
+  String? _responsable;
+  
 
   static const steps = [
     StepItem(icon: Icons.info_outline, label: 'General'),
@@ -33,31 +31,23 @@ class _DescriptionPageState extends State<DescriptionPage> {
   
   @override
   void dispose() {
-    _companyPremises.dispose();
     _startTime.dispose();
     _endTime.dispose();
-    _clientSupervisor.dispose();
-    _supervisor.dispose();
-    _workArea.dispose();
-    _license.dispose();
+    _description.dispose();
     super.dispose();    
   }
 
   void _submit() {
     // final ok = _formKey.currentState?.validate() ?? false;
     // if (!ok) return;
-
-    // final companyPremises = _companyPremises.text.trim();
     // final startTime = _startTime.text.trim();
     // final endTime = _endTime.text.trim();    
-    // final clientSupervisor = _clientSupervisor.text.trim();
-    // final supervisor = _supervisor.text.trim();
-    // final workArea = _workArea.text.trim();
-    // final license = _license.text.trim();
-
+    // final responsable = _responsable.text.trim();
+    // final description = _description.text.trim();
+   
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ProgressActivityPage()),
+      MaterialPageRoute(builder: (context) => const MenuPage(initialTab: 2)),
     );
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Formulario válido.')),
@@ -67,7 +57,7 @@ class _DescriptionPageState extends State<DescriptionPage> {
   void _back(){
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const GeneralPage()),
+      MaterialPageRoute(builder: (context) => const PersonnelPage()),
     );
   }
 
@@ -83,7 +73,7 @@ class _DescriptionPageState extends State<DescriptionPage> {
             ),
             StepProgressBar(
               steps: steps, 
-              currentIndex: 1,
+              currentIndex: 4,
               activeColor: brand,
               inactiveColor: line,
             ),
@@ -131,21 +121,21 @@ class _DescriptionPageState extends State<DescriptionPage> {
 
                           // Planta
                           Text(
-                            'Planta',
+                            'Motivo',
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 6),
                           fieldContainer(
                             child: TextFormField(
-                              controller: _companyPremises,
-                              decoration: inputDec('Planta'),
+                              controller: _description,
+                              decoration: inputDec('Motivo'),
                               validator: (v) =>
                                   (v == null || v.trim().isEmpty)
-                                      ? 'Ingrese la planta'
+                                      ? 'Ingrese el motivo'
                                       : null,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 30),
 
                           // Hora de inicio / Hora de término
                           Row(
@@ -219,76 +209,22 @@ class _DescriptionPageState extends State<DescriptionPage> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
-
-                          // Supervisor del cliente
+                          const SizedBox(height: 30),
                           Text(
-                            'Supervisor del cliente',
+                            'Responsable',
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 6),
                           fieldContainer(
-                            child: TextFormField(
-                              controller: _clientSupervisor,
-                              decoration: inputDec('Supervisor del cliente'),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? 'Ingrese el supervisor del cliente'
-                                      : null,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Supervisor interno
-                          Text(
-                            'Supervisor interno',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const SizedBox(height: 6),
-                          fieldContainer(
-                            child: TextFormField(
-                              controller: _supervisor,
-                              decoration: inputDec('Supervisor interno'),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? 'Ingrese el supervisor interno'
-                                      : null,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Área de trabajo
-                          Text(
-                            'Área de trabajo',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const SizedBox(height: 6),
-                          fieldContainer(
-                            child: TextFormField(
-                              controller: _workArea,
-                              decoration: inputDec('Área de trabajo'),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? 'Ingrese el área de trabajo'
-                                      : null,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Licencia/OM
-                          Text(
-                            'Licencia/OM',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const SizedBox(height: 6),
-                          fieldContainer(
-                            child: TextFormField(
-                              controller: _license,
-                              decoration: inputDec('Licencia/OM'),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? 'Ingrese la licencia ambiental'
-                                      : null,
+                            child: DropdownButtonFormField<String>(
+                              value: _responsable,
+                              decoration: inputDec('Responsable'),
+                              items: const [
+                                DropdownMenuItem(value: 'Cliente', child: Text('Cliente')),
+                                DropdownMenuItem(value: 'Ayasa', child: Text('Ayasa')),
+                              ],
+                              onChanged: (v) => setState(() => _responsable = v),
+                              validator: (v) => v == null ? 'Seleccione una especialidad' : null,
                             ),
                           ),
                           const SizedBox(height: 25),
@@ -297,7 +233,7 @@ class _DescriptionPageState extends State<DescriptionPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 155), // Here I manually add space for the 'Anterior' and 'Siguiente' buttons
 
                   // botones
                   SafeArea(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'card_item_progress.dart';
-import 'mini_button.dart';
+import 'item_progress.dart';
+import '../mini_button.dart';
 import 'dart:math';
 import '../../../data/models/temp.dart';
-import 'status_tag.dart';
+import '../status_tag.dart';
 
 class ProgressList extends StatelessWidget {
   const ProgressList({

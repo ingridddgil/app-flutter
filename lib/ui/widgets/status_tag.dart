@@ -15,14 +15,14 @@ class StatusTag extends StatelessWidget{
     return Container(
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 9, vertical: 2),
         child: Text(
           status,
           style: GoogleFonts.montserrat(
-            color: Colors.white,
+            color: Colors.black,
             fontSize:11,
             fontWeight: FontWeight.w500
           )

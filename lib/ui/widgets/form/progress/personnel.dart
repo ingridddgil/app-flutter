@@ -1,13 +1,14 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
-
 import '../../../styles/progress_bar_form_theme.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
-import '../../form/progress/progress_activity.dart'; // Back step
-import '../../form/progress/issues.dart'; // Next step (when you have it)
-import '../../../../data/models/person_data.dart';   // <- create this model
+import '../../form/progress/progress_activity.dart'; 
+import '../../form/progress/issues.dart';
+import '../../../../data/models/person_data.dart';  
+import '../../../../data/services/odoo_client.dart'; 
+
 
 class PersonnelPage extends StatefulWidget {
   const PersonnelPage({super.key});
@@ -17,38 +18,131 @@ class PersonnelPage extends StatefulWidget {
 }
 
 class _PersonnelPageState extends State<PersonnelPage> {
-  // Search text controller
+  String pink(String msg) => "\x1B[38;2;255;105;180m$msg\x1B[0m";
+  String green(String msg) => "\x1B[32m$msg\x1B[0m";
+  String red(String msg)   => "\x1B[31m$msg\x1B[0m";
+
   final _searchCtrl = TextEditingController();
 
-  /// All people available to assign (later: load from Odoo).
-  /// For now, this is just sample data.
-  final List<PersonData> _allPeople = [
-    PersonData(
-      id: 1,
-      name: 'Ingrid Sarahí Gil Hernandez',
-      category: 'Supervisor',
-    ),
-    PersonData(
-      id: 2,
-      name: 'Juan Pérez',
-      category: 'Técnico',
-    ),
-    PersonData(
-      id: 3,
-      name: 'María López',
-      category: 'Ayudante',
+  final List<PersonData> _allPeople = [];
 
-    ),
-  ];
-
-  /// People assigned to this log.
+  // Odoo client instance 
+  late final OdooClient _odoo;
   final List<PersonData> _assigned = [];
-
-  /// Which rows are currently selected (for deletion).
   final Set<int> _selectedIds = {};
-
-  /// Signature images, keyed by person id.
   final Map<int, Uint8List> _signatures = {};
+
+  @override
+  void initState(){
+    super.initState();
+
+    _odoo = OdooClient(
+      baseUrl: 'http://192.168.68.140:8069',
+      dbName: 'odoo18',
+    );
+    _loadEmployees();
+  }
+
+Future<void> _loadEmployees() async {
+  debugPrint(pink('_loadEmployees() started'));
+  
+  try {
+    debugPrint(pink('Attempting authentication...'));
+    final loggedIn = await _odoo.authenticate('admin', 'admin'); 
+    debugPrint(pink('Authentication result: $loggedIn'));
+    
+    if (!loggedIn) {
+      debugPrint(red('No se pudo autenticar'));
+      
+      // Mostrar error en pantalla
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error: No se pudo autenticar en Odoo'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
+    debugPrint(pink('Fetching personnel data...'));
+    final raw = await _odoo.fetchPersonnelRaw();
+    debugPrint(pink('Raw data received: ${raw.length} records'));
+    debugPrint(pink('First record (if any): ${raw.isNotEmpty ? raw.first : "empty"}'));
+
+    if (raw.isEmpty) {
+      debugPrint(pink('No employees found in database'));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se encontraron empleados en la base de datos'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    final employees = raw.map((e) {
+      debugPrint(pink('Processing employee: $e'));
+      
+      String category = 'Sin categoría';
+      
+      // Manejo seguro de job_title
+      final jobTitle = e['job_title'];
+      debugPrint(pink('  job_title value: $jobTitle (type: ${jobTitle.runtimeType})'));
+      
+      if (jobTitle is String && jobTitle.trim().isNotEmpty) {
+        category = jobTitle.trim();
+      } else {
+        final jobId = e['job_id'];
+        debugPrint(pink('  $jobId (type: ${jobId.runtimeType})'));
+
+        if (jobId is List && jobId.length >= 2 && jobId[1] is String) {
+          final jobName = (jobId[1] as String).trim();
+          if (jobName.isNotEmpty) {
+           category = jobName;
+          }
+        }
+      }
+
+      return PersonData(
+        id: e['id'] as int,
+        name: e['name'] as String,
+        category: category,
+      );
+    }).toList();
+
+    debugPrint(pink('Employees processed: ${employees.length}'));
+    for (final e in employees) {
+      debugPrint(pink('   Employee: id=${e.id}, name=${e.name}, category=${e.category}'));
+    }
+
+    setState(() {
+      _allPeople
+        ..clear()
+        ..addAll(employees);
+    });
+    
+    debugPrint(pink('setState completed, _allPeople.length = ${_allPeople.length}'));
+
+  } catch (e, stackTrace) {
+    debugPrint(pink('ERROR in _loadEmployees: $e'));
+    debugPrint(pink('Stack trace: $stackTrace'));
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al cargar empleados: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+}
+
 
   static const steps = [
     StepItem(icon: Icons.info_outline, label: 'General'),
@@ -77,9 +171,7 @@ class _PersonnelPageState extends State<PersonnelPage> {
     );
   }
 
-  // -------------------- Helpers: search / assign --------------------
-
-  /// Filtered list from `_allPeople` based on the search text.
+  // filter to search employees
   List<PersonData> get _filteredPeople {
     final q = _searchCtrl.text.trim().toLowerCase();
     if (q.isEmpty) return [];
@@ -216,6 +308,7 @@ class _PersonnelPageState extends State<PersonnelPage> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint(pink('PersonnelPage build: allPeople=${_allPeople.length}'));
     final assigned = _assigned;
 
     return Scaffold(

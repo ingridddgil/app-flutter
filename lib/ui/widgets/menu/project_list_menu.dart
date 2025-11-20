@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'item_project.dart';
+import '../cards/card_item_project.dart';
 import 'dart:math';
 import '../../../data/models/temp.dart';
 
-class ProjectList extends StatelessWidget {
-  const ProjectList({
+class ProjectListMenu extends StatelessWidget {
+  const ProjectListMenu({
     super.key
   });
 

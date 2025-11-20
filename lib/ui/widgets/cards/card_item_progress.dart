@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_demo/ui/widgets/buttons/three_dot_menu.dart';
+import 'package:flutter_demo/ui/widgets/form/progress/general.dart';
 class CardItemProgress extends StatelessWidget {
   final String id;
   final DateTime date;
@@ -26,7 +27,7 @@ class CardItemProgress extends StatelessWidget {
     final day = d.day.toString().padLeft(2, '0');
     final month = d.month.toString().padLeft(2, '0');
     final year = d.year.toString();
-    return '$day/$month/$year'; // 18/11/2025
+    return '$day/$month/$year';
   }
 
   @override
@@ -48,34 +49,26 @@ class CardItemProgress extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Encabezado con gradiente
+          // ENCABEZADO
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              // gradient: LinearGradient(
-                // color: [
-                color: color,
-                  // const Color(0xFF8B1E04),
-                  // const Color.fromARGB(255, 180, 42, 8),
-                // ],
-                // begin: Alignment.centerLeft,
-                // end: Alignment.centerRight,
-              // ),
+              color: color,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ID AVANCE + status
+                // ID AVANCE + STATUS + MENU
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "ID AVANCE",
+                      'ID AVANCE',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                       ),
                     ),
-
+                    SizedBox(width: 100),
                     status ??
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -86,14 +79,51 @@ class CardItemProgress extends StatelessWidget {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Text(
-                            'Asignado',
+                          child: const Text(
+                            'Sin estado',
                             style: TextStyle(
-                              color: Colors.green.shade700,
+                              color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
+
+                    ThreeDotMenu(
+                      onEdit: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const GeneralPage(),
+                          ),
+                        );
+                      },
+                      onDelete: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              iconColor: Colors.white,
+                              title: const Text('¿Está seguro que desea eliminar este registro?'),
+                              content: const Text('Esta acción es irreversible'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text(
+                                    'Cancelar',
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Eliminar'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -109,7 +139,7 @@ class CardItemProgress extends StatelessWidget {
             ),
           ),
 
-          // Contenido
+          // CONTENIDO
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(

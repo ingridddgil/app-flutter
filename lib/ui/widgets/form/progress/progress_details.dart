@@ -4,10 +4,10 @@ import 'package:flutter_demo/ui/widgets/progress_bar.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
-import '../../../../data/models/progress_details_form.dart';
+import '../../../../data/models/progress_activity.dart';
 
 class ProgressDetailsPage extends StatefulWidget {
-  final ProgressDetailsData? initial;
+  final ProgressActivity? initial;
   const ProgressDetailsPage({super.key, this.initial});
 
   @override
@@ -66,7 +66,7 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
     final amountRemaining = _toDoubleSafely(_amountRemainingCtrl.text);
     final amountDisbursed = _toDoubleSafely(_amountDisbursedCtrl.text);
 
-    final data = ProgressDetailsData(
+    final data = ProgressActivity(
       task: _taskCtrl.text.trim(),
       detail: _detailCtrl.text.trim(),
       quantityExecuted: executed,

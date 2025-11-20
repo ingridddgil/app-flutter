@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'item_progress.dart';
-import '../mini_button.dart';
+import '../cards/card_item_progress.dart';
 import 'dart:math';
 import '../../../data/models/temp.dart';
-import '../status_tag.dart';
-
-class ProgressList extends StatelessWidget {
-  
-  const ProgressList({super.key});
+import '../buttons/status_tag.dart';
+class ProgressListMenu extends StatelessWidget {
+  const ProgressListMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +28,12 @@ class ProgressList extends StatelessWidget {
       (i) => clients[random.nextInt(clients.length)],
     );
 
-    final statusColors = [Colors.blue, Colors.green, const Color(0xFFE2BC28)];
-    final statuses = ['Activo', 'Pendiente', 'Completado', 'Cancelado'];
-
-    final state = List.generate(
-      projectTitles.length,
-      (_) => statuses[random.nextInt(statusColors.length)],
-    );
+    // COLORES POSIBLES DE ESTADO
+    final statusColors = [
+      Colors.blue,
+      Colors.green,
+      const Color(0xFFE2BC28),
+    ];
 
     final project = List.generate(
       projectTitles.length,
@@ -48,33 +44,20 @@ class ProgressList extends StatelessWidget {
       itemCount: projectTitles.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, i) {
-        final headerColor = statusColors[statuses.indexOf(state[i])];
+        // Tomamos un color aleatorio
+        final headerColor = statusColors[random.nextInt(statusColors.length)];
+        final statusText = _getStatusText(headerColor);
 
         return CardItemProgress(
           id: progressIDs[i],
           date: dates[i],
-          client: clientList[i],       
+          client: clientList[i],
           project: project[i],
-          task: 'Tarea ${i + 1}', 
+          task: 'Tarea ${i + 1}',
           color: headerColor,
           status: StatusTag(
             color: Colors.white,
-            status: _getStatusText(headerColor),
-          ),
-
-          actions: Row(
-            children: const [
-              IconButton(
-                icon: Icon(Icons.delete, color:Color(0xFF8B1E04)),
-                // onPressed: onDelete,
-              ),
-              SizedBox(width: 8),
-              MiniButton(
-                text: 'Editar',
-                color: Color(0xFF8B1E04),
-                outlined: true,
-              ),
-            ],
+            status: statusText,
           ),
         );
       },
@@ -84,7 +67,7 @@ class ProgressList extends StatelessWidget {
   String _getStatusText(Color color) {
     if (color == Colors.blue) return 'Confirmado';
     if (color == Colors.green) return 'Asignado';
-    if (color == Color(0xFFE2BC28)) return 'Borrador';
+    if (color == const Color(0xFFE2BC28)) return 'Borrador';
     return '';
   }
 }

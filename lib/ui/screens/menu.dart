@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/ui/widgets/form/progress/general.dart';
-import '../widgets/circle_icon_button.dart'; 
-import '../widgets/tab_pill.dart';
-import '../widgets/cards/task_list_menu.dart';
-import '../widgets/cards/progress_list_menu.dart';
-import '../widgets/cards/project_list_menu.dart';
+import '../widgets/buttons/circle_icon_button.dart'; 
+import '../widgets/buttons/tab_pill.dart';
+import '../widgets/menu/task_list_menu.dart';
+import '../widgets/menu/progress_list_menu.dart';
+import '../widgets/menu/project_list_menu.dart';
 
 class MenuPage extends StatefulWidget {
   final int initialTab;
@@ -110,11 +110,11 @@ class _ProgressPage extends State<MenuPage> {
   }
   Widget _buildContent(int sel){
     if (sel == 0) {
-      return const ProjectList();
+      return const ProjectListMenu();
     } else if (sel == 1) {
-      return const TaskList(); // esta se cambia por la pantalla de tareas cuando haya
+      return const TaskListMenu(); // esta se cambia por la pantalla de tareas cuando haya
     } else {
-      return const ProgressList();
+      return const ProgressListMenu();
     } /* else if (sel == 3)  { 
       return const GeneralPage();
     } */

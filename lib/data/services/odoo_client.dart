@@ -14,7 +14,7 @@ class OdooClient {
   String green(String msg) => "\x1B[32m$msg\x1B[0m";
   String red(String msg)   => "\x1B[31m$msg\x1B[0m";
   String yellow(String msg)=> "\x1B[33m$msg\x1B[0m";
-  String pink(String msg) => "\x1B[38;2;255;105;180m$msg\x1B[0m]";
+  String pink(String msg) => "\x1B[38;2;255;105;180m$msg\x1B[0m";
 
   OdooClient({
     required this.baseUrl,

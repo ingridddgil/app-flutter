@@ -1,13 +1,13 @@
 import 'dart:typed_data';
 
-class AssignedPersonData {
+class ProgressPersonnel {
   final String id;
   final String name;
   final String category;
   final double normalHours;
   final Uint8List? signature; // null if not signed yet
 
-  AssignedPersonData({
+  ProgressPersonnel({
     required this.id,
     required this.name,
     required this.category,
@@ -15,14 +15,14 @@ class AssignedPersonData {
     this.signature,
   });
 
-  AssignedPersonData copyWith({
+  ProgressPersonnel copyWith({
     String? id,
     String? name,
     String? category,
     double? normalHours,
     Uint8List? signature,
   }) {
-    return AssignedPersonData(
+    return ProgressPersonnel(
       id: id ?? this.id,
       name: name ?? this.name,
       category: category ?? this.category,

@@ -5,8 +5,8 @@ import '../../../styles/progress_bar_form_theme.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import 'progress_details.dart';
-import '../../../../data/models/progress_details_form.dart';
-import '../../cards/task_group.dart';
+import '../../../../data/models/progress_activity.dart';
+import '../../menu/task_group.dart';
 import 'description.dart';
 
 class ProgressActivityPage extends StatefulWidget {
@@ -17,7 +17,7 @@ class ProgressActivityPage extends StatefulWidget {
 }
 
 class _ProgressActivityPageState extends State<ProgressActivityPage> {
-  final List<ProgressDetailsData> _items = [];
+  final List<ProgressActivity> _items = [];
 
   static const steps = [
     StepItem(icon: Icons.info_outline, label: 'General'),
@@ -50,7 +50,7 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
   // -------------------- CRUD: Create / Edit / Delete --------------------
 
   Future<void> _create() async {
-    final result = await Navigator.push<ProgressDetailsData>(
+    final result = await Navigator.push<ProgressActivity>(
       context,
       MaterialPageRoute(builder: (_) => const ProgressDetailsPage()),
     );
@@ -60,11 +60,11 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
     }
   }
 
-  Future<void> _editItem(ProgressDetailsData item) async {
+  Future<void> _editItem(ProgressActivity item) async {
     final index = _items.indexOf(item);
     if (index == -1) return;
 
-    final updated = await Navigator.push<ProgressDetailsData>(
+    final updated = await Navigator.push<ProgressActivity>(
       context,
       MaterialPageRoute(builder: (_) => ProgressDetailsPage(initial: item)),
     );
@@ -74,15 +74,15 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
     }
   }
 
-  void _deleteItem(ProgressDetailsData item) {
+  void _deleteItem(ProgressActivity item) {
     setState(() => _items.remove(item));
   }
 
   // -------------------- Grouping Logic --------------------
 
   /// Groups activities by "task" (Tarea/Partida)
-  Map<String, List<ProgressDetailsData>> _groupByTask(List<ProgressDetailsData> list) {
-    final map = <String, List<ProgressDetailsData>>{};
+  Map<String, List<ProgressActivity>> _groupByTask(List<ProgressActivity> list) {
+    final map = <String, List<ProgressActivity>>{};
 
     for (final it in list) {
       map.putIfAbsent(it.task, () => []).add(it);
@@ -92,7 +92,7 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
   }
 
   /// Calculates the average progress of a group (value between 0 and 1)
-  double _avgProgress(List<ProgressDetailsData> list) {
+  double _avgProgress(List<ProgressActivity> list) {
     if (list.isEmpty) return 0.0;
 
     final sum = list.fold<double>(

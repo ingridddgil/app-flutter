@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../styles/progress_bar_form_theme.dart';
-import '../../../data/models/progress_details_form.dart';
+import '../../../data/models/progress_activity.dart';
 
 
 class TaskGroup extends StatefulWidget {
   final String taskName;
-  final List<ProgressDetailsData> items;
+  final List<ProgressActivity> items;
   final double avgProgress;
-  final void Function(ProgressDetailsData) onEdit;
-  final void Function(ProgressDetailsData) onDelete;
+  final void Function(ProgressActivity) onEdit;
+  final void Function(ProgressActivity) onDelete;
 
   const TaskGroup({
+    super.key,
     required this.taskName,
     required this.items,
     required this.avgProgress,

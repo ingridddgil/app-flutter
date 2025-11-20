@@ -1,4 +1,4 @@
-class ProgressDetailsData {
+class ProgressActivity {
   final String task;
   final String detail; 
   final double quantityExecuted; 
@@ -10,7 +10,7 @@ class ProgressDetailsData {
   final double percentageProgress;
   final double cumulativePercentage;
 
-  const ProgressDetailsData({
+  const ProgressActivity({
     required this.task,
     required this.detail,
     required this.quantityExecuted,
@@ -23,7 +23,7 @@ class ProgressDetailsData {
     required this.cumulativePercentage,
   });
 
-  ProgressDetailsData copyWith({
+  ProgressActivity copyWith({
     String? task,
     String? detail,
     double? quantityExecuted,
@@ -35,7 +35,7 @@ class ProgressDetailsData {
     double? percentageProgress,
     double? cumulativePercentage,  
   }) {
-    return ProgressDetailsData(
+    return ProgressActivity(
       task: task ?? this.task,
       detail: detail ?? this.detail,
       quantityExecuted: quantityExecuted ?? this.quantityExecuted,

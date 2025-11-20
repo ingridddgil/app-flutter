@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'item_task.dart';
+import '../cards/card_item_task.dart';
 import 'dart:math';
 import '../progress_bar.dart';
 import '../../../data/models/temp.dart';
 
-class TaskList extends StatelessWidget {
-  const TaskList({
+class TaskListMenu extends StatelessWidget {
+  const TaskListMenu({
     super.key
   });
 

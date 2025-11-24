@@ -15,19 +15,37 @@ class ProgressPersonnel {
     this.signature,
   });
 
-  ProgressPersonnel copyWith({
-    String? id,
-    String? name,
-    String? category,
-    double? normalHours,
-    Uint8List? signature,
-  }) {
+  // ProgressPersonnel copyWith({
+  //   String? id,
+  //   String? name,
+  //   String? category,
+  //   double? normalHours,
+  //   Uint8List? signature,
+  // }) {
+  //   return ProgressPersonnel(
+  //     id: id ?? this.id,
+  //     name: name ?? this.name,
+  //     category: category ?? this.category,
+  //     normalHours: normalHours ?? this.normalHours,
+  //     signature: signature ?? this.signature,
+  //   );
+  // }
+
+  Map<String, dynamic> toJson() => {
+    'id': id ,
+    'name': name,
+    'category': category,
+    'normalHours': normalHours,
+    'signature': signature,
+  };
+
+  factory ProgressPersonnel.fromJson(Map<String, dynamic> json) {
     return ProgressPersonnel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      category: category ?? this.category,
-      normalHours: normalHours ?? this.normalHours,
-      signature: signature ?? this.signature,
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      category: json['category'] ?? '',
+      normalHours: json['normalHours'] ?? '',
     );
-  }
+  } 
+
 }

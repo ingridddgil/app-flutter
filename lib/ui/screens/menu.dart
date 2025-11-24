@@ -84,15 +84,15 @@ class _ProgressPage extends State<MenuPage> {
                   // ),
                   // const SizedBox(width: 8),
 
-                  CircleIconButton(
-                    icon: Icons.add,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const GeneralPage())
-                      );
-                    },
-                  ),
+                  // CircleIconButton(
+                  //   icon: Icons.add,
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => const GeneralPage())
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
               const SizedBox(height: 16),

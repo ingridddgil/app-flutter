@@ -1,17 +1,21 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/data/models/progress_activity.dart';
+import 'package:flutter_demo/data/models/progress_personnel.dart';
 import 'package:signature/signature.dart';
 import '../../../styles/progress_bar_form_theme.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
-import '../../form/progress/progress_activity.dart'; 
 import '../../form/progress/issues.dart';
-import '../../../../data/models/person_data.dart';  
-import '../../../../data/services/odoo_client.dart'; 
+import '../../../../data/remote/odoo_client.dart'; 
+import '../../../../data/models/employee_data.dart';
+import '../../../../env.dart';
 
 
 class PersonnelPage extends StatefulWidget {
-  const PersonnelPage({super.key});
+  
+  final List<ProgressActivity> activityDetails;
+  const PersonnelPage({super.key, required this.activityDetails});
 
   @override
   State<PersonnelPage> createState() => _PersonnelPageState();
@@ -24,11 +28,11 @@ class _PersonnelPageState extends State<PersonnelPage> {
 
   final _searchCtrl = TextEditingController();
 
-  final List<PersonData> _allPeople = [];
+  final List<EmployeeData> _allPeople = [];
 
   // Odoo client instance 
   late final OdooClient _odoo;
-  final List<PersonData> _assigned = [];
+  final List<EmployeeData> _assigned = [];
   final Set<int> _selectedIds = {};
   final Map<int, Uint8List> _signatures = {};
 
@@ -37,8 +41,8 @@ class _PersonnelPageState extends State<PersonnelPage> {
     super.initState();
 
     _odoo = OdooClient(
-      baseUrl: 'http://192.168.68.140:8069',
-      dbName: 'odoo18',
+      baseUrl: Env.url,
+      dbName: Env.db,
     );
     _loadEmployees();
   }
@@ -107,7 +111,7 @@ Future<void> _loadEmployees() async {
         }
       }
 
-      return PersonData(
+      return EmployeeData(
         id: e['id'] as int,
         name: e['name'] as String,
         category: category,
@@ -155,15 +159,21 @@ Future<void> _loadEmployees() async {
   // -------------------- Navigation --------------------
 
   void _back() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ProgressActivityPage()),
-    );
+    Navigator.pop(context);
   }
 
   void _submit() {
+
+    final personnel = _assigned.map((e) {
+      return ProgressPersonnel(
+        id: e.id.toString(),
+        name: e.name.toString(),
+        category: e.category.toString(),
+        normalHours: 0.0,
+      );
+    }).toList();
     Navigator.push(context,
-      MaterialPageRoute(builder: (_) => const IssuesPage()),
+      MaterialPageRoute(builder: (_) => IssuesPage(personnel: personnel)),
     );
     // Later: navigate to ContratiemposPage
     ScaffoldMessenger.of(context).showSnackBar(
@@ -172,7 +182,7 @@ Future<void> _loadEmployees() async {
   }
 
   // filter to search employees
-  List<PersonData> get _filteredPeople {
+  List<EmployeeData> get _filteredPeople {
     final q = _searchCtrl.text.trim().toLowerCase();
     if (q.isEmpty) return [];
     return _allPeople
@@ -181,7 +191,7 @@ Future<void> _loadEmployees() async {
   }
 
   /// Add a person to `_assigned` if not already there.
-  void _addPerson(PersonData p) {
+  void _addPerson(EmployeeData p) {
     final alreadyAssigned = _assigned.any((it) => it.id == p.id);
     if (alreadyAssigned) return;
 
@@ -213,7 +223,7 @@ Future<void> _loadEmployees() async {
 
   // -------------------- Signature drawer --------------------
 
-  Future<void> _openSignatureDrawer(PersonData person) async {
+  Future<void> _openSignatureDrawer(EmployeeData person) async {
     final controller = SignatureController(
       penStrokeWidth: 2,
       penColor: Colors.black,
@@ -551,7 +561,7 @@ Future<void> _loadEmployees() async {
 
   // -------------------- Row builder --------------------
 
-  Widget _buildPersonRow(PersonData p) {
+  Widget _buildPersonRow(EmployeeData p) {
     final isSelected = _selectedIds.contains(p.id);
     final signBytes = _signatures[p.id];
 

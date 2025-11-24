@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/ui/widgets/form/progress/personnel.dart';
+import 'package:flutter_demo/data/models/progress_issues.dart';
+import 'package:flutter_demo/data/models/progress_personnel.dart';
+import 'package:flutter_demo/data/repositories/progress_repository.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
 import '../../../screens/menu.dart';
+import '../../../../data/controllers/progress_form.dart';
 
 class IssuesPage extends StatefulWidget {
-  const IssuesPage({super.key});
+  final List<ProgressPersonnel> personnel;
+  const IssuesPage({super.key, required this.personnel});
 
   @override
   State<IssuesPage> createState() => _IssuesPageState();
@@ -19,6 +23,7 @@ class _IssuesPageState extends State<IssuesPage> {
   final _endTime = TextEditingController();
   final _description = TextEditingController();
   String? _responsable;
+  final form = ProgressFormController.instance;
   
 
   static const steps = [
@@ -36,29 +41,50 @@ class _IssuesPageState extends State<IssuesPage> {
     _description.dispose();
     super.dispose();    
   }
-
   void _submit() {
-    // final ok = _formKey.currentState?.validate() ?? false;
-    // if (!ok) return;
-    // final startTime = _startTime.text.trim();
-    // final endTime = _endTime.text.trim();    
-    // final responsable = _responsable.text.trim();
-    // final description = _description.text.trim();
-   
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const MenuPage(initialTab: 2)),
+    final ok = _formKey.currentState?.validate() ?? false;
+    if (!ok) return;
+    final sTod = _tryParseHHmm(_startTime.text.trim());
+    final eTod = _tryParseHHmm(_endTime.text.trim());
+    if (sTod == null || eTod == null) return;
+
+    final date = DateTime.now();
+
+    final startDt = DateTime(
+      date.year, date.month, date.day,
+      sTod.hour, sTod.minute,
     );
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Formulario válido.')),
+
+    final endDt = DateTime(
+      date.year, date.month, date.day,
+      eTod.hour, eTod.minute,
+    );
+
+    final issue = ProgressIssues(
+      issueStartTime: startDt,
+      issueEndTime: endDt,
+      description: _description.text.trim(),
+      responsable: _responsable ?? '',
+    );
+
+    // ProgressFormController.instance.issues = issue;
+    form.issues = issue;
+
+    final progress = form.buildProgressData();
+    ProgressRepository.instance.add(progress);
+
+    form.reset();
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const MenuPage(initialTab: 2)),
+      (route) => false,
     );
   }
 
+
   void _back(){
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PersonnelPage()),
-    );
+    Navigator.pop(context);
   }
 
   @override

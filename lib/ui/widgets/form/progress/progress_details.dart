@@ -55,42 +55,36 @@ class _ProgressDetailsPageState extends State<ProgressDetailsPage> {
     super.dispose();
   }
 
-  void _submit() {
-    // final ok = _formKey.currentState?.validate() ?? false;
-    // if (!ok) return;
+void _submit() {
+  final ok = _formKey.currentState?.validate() ?? false;
+  if (!ok) return;
 
-    final executed = _toDoubleSafely(_quantityExecutedCtrl.text);
-    final requested = _toDoubleSafely(_quantityRequestedCtrl.text);      
-    final remaining = _toDoubleSafely(_quantityRemainingCtrl.text);
-    final amountTotal = _toDoubleSafely(_amountTotalCtrl.text);
-    final amountRemaining = _toDoubleSafely(_amountRemainingCtrl.text);
-    final amountDisbursed = _toDoubleSafely(_amountDisbursedCtrl.text);
+  final executed = _toDoubleSafely(_quantityExecutedCtrl.text);
+  final requested = _toDoubleSafely(_quantityRequestedCtrl.text);
+  final remaining = _toDoubleSafely(_quantityRemainingCtrl.text);
+  final amountTotal = _toDoubleSafely(_amountTotalCtrl.text);
+  final amountRemaining = _toDoubleSafely(_amountRemainingCtrl.text);
+  final amountDisbursed = _toDoubleSafely(_amountDisbursedCtrl.text);
 
-    final data = ProgressActivity(
-      task: _taskCtrl.text.trim(),
-      detail: _detailCtrl.text.trim(),
-      quantityExecuted: executed,
-      quantityRequested: requested,
-      quantityRemaining: remaining,
-      amountTotal: amountTotal,
-      amountRemaining: amountRemaining,
-      amountDisbursed: amountDisbursed,
-      percentageProgress: _percentageProgress,
-      cumulativePercentage: _cumulativePercentageCtrl,
-    );
+  final activity = ProgressActivity(
+    task: _taskCtrl.text.trim(),
+    detail: _detailCtrl.text.trim(),
+    quantityExecuted: executed,
+    quantityRequested: requested,
+    quantityRemaining: remaining,
+    amountTotal: amountTotal,
+    amountRemaining: amountRemaining,
+    amountDisbursed: amountDisbursed,
+    percentageProgress: _percentageProgress,
+    cumulativePercentage: _cumulativePercentageCtrl,
+  );
+    Navigator.pop(context, activity);
 
-    Navigator.pop(context,data);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Formulario válido.')),
-    );
   }
 
   void _back() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const DescriptionPage()),
-    );
+    Navigator.pop(context);
   }
 
   @override 

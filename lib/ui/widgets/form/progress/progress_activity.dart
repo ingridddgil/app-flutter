@@ -1,5 +1,6 @@
 // ui/widgets/form/progress/progress_activity.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/data/models/progress_description.dart';
 import 'package:flutter_demo/ui/widgets/form/progress/personnel.dart';
 import '../../../styles/progress_bar_form_theme.dart';
 import '../../header_form.dart';
@@ -7,17 +8,19 @@ import '../../progress_bar_form.dart';
 import 'progress_details.dart';
 import '../../../../data/models/progress_activity.dart';
 import '../../menu/task_group.dart';
-import 'description.dart';
+import '../../../../data/controllers/progress_form.dart';
 
 class ProgressActivityPage extends StatefulWidget {
-  const ProgressActivityPage({super.key});
+  final ProgressDescription description;
+  const ProgressActivityPage({super.key, required this.description});
 
   @override
   State<ProgressActivityPage> createState() => _ProgressActivityPageState();
 }
 
 class _ProgressActivityPageState extends State<ProgressActivityPage> {
-  final List<ProgressActivity> _items = [];
+  final form = ProgressFormController.instance;
+  List<ProgressActivity> get _activities => form.activities;
 
   static const steps = [
     StepItem(icon: Icons.info_outline, label: 'General'),
@@ -32,7 +35,9 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
   void _submit() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PersonnelPage()),
+      MaterialPageRoute(
+        builder: (context) => PersonnelPage(activityDetails: _activities),
+      ),
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -41,10 +46,7 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
   }
 
   void _back() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const DescriptionPage()),
-    );
+    Navigator.pop(context);
   }
 
   // -------------------- CRUD: Create / Edit / Delete --------------------
@@ -56,12 +58,12 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
     );
 
     if (result != null) {
-      setState(() => _items.add(result));
+      setState(() => _activities.add(result));
     }
   }
 
   Future<void> _editItem(ProgressActivity item) async {
-    final index = _items.indexOf(item);
+    final index = _activities.indexOf(item);
     if (index == -1) return;
 
     final updated = await Navigator.push<ProgressActivity>(
@@ -70,12 +72,12 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
     );
 
     if (updated != null) {
-      setState(() => _items[index] = updated);
+      setState(() => _activities[index] = updated);
     }
   }
 
   void _deleteItem(ProgressActivity item) {
-    setState(() => _items.remove(item));
+    setState(() => _activities.remove(item));
   }
 
   // -------------------- Grouping Logic --------------------
@@ -85,7 +87,7 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
     final map = <String, List<ProgressActivity>>{};
 
     for (final it in list) {
-      map.putIfAbsent(it.task, () => []).add(it);
+      map.putIfAbsent(it.task, () => <ProgressActivity>[]).add(it);
     }
 
     return map;
@@ -107,7 +109,7 @@ class _ProgressActivityPageState extends State<ProgressActivityPage> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = _groupByTask(_items);
+    final grouped = _groupByTask(_activities);
 
     return Scaffold(
       backgroundColor: Colors.white,

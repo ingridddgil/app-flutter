@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/data/models/progress_description.dart';
 import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
-import 'general.dart';
 import 'progress_activity.dart';
+import '../../../../data/models/progress_general.dart';
+import '../../../../data/controllers/progress_form.dart';
 
 class DescriptionPage extends StatefulWidget {
-  const DescriptionPage({super.key});
+  final ProgressGeneral general;
+
+  const DescriptionPage({super.key, required this.general});
 
   @override
   State<DescriptionPage> createState() => _DescriptionPageState();
@@ -44,31 +48,52 @@ class _DescriptionPageState extends State<DescriptionPage> {
   }
 
   void _submit() {
-    // final ok = _formKey.currentState?.validate() ?? false;
-    // if (!ok) return;
+    final ok = _formKey.currentState?.validate() ?? false;
+    if (!ok) return;
 
-    // final companyPremises = _companyPremises.text.trim();
-    // final startTime = _startTime.text.trim();
-    // final endTime = _endTime.text.trim();    
-    // final clientSupervisor = _clientSupervisor.text.trim();
-    // final supervisor = _supervisor.text.trim();
-    // final workArea = _workArea.text.trim();
-    // final license = _license.text.trim();
+    final sTod = _tryParseHHmm(_startTime.text.trim());
+    final eTod = _tryParseHHmm(_endTime.text.trim());
+    if (sTod == null || eTod == null) return;
+
+    final now = DateTime.now();
+
+    final startDt = DateTime(
+      now.year, now.month, now.day,
+      sTod.hour, sTod.minute,
+    );
+
+    final endDt = DateTime(
+      now.year, now.month, now.day,
+      eTod.hour, eTod.minute,
+    );
+
+    final description = ProgressDescription(
+      companyPremises: '',
+      startTime: startDt,
+      endTime: endDt,
+      clientSupervisor: _clientSupervisor.text.trim(),
+      supervisor: _supervisor.text.trim(),
+      workArea: _workArea.text.trim(),
+      license: _license.text.trim(),
+    );
+
+    ProgressFormController.instance.description = description;
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ProgressActivityPage()),
+      MaterialPageRoute(
+        builder: (context) => ProgressActivityPage(description: description),
+      ),
     );
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Formulario válido.')),
     );
   }
 
+
   void _back(){
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const GeneralPage()),
-    );
+    Navigator.pop(context);
   }
 
   @override

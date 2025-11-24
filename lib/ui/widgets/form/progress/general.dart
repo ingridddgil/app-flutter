@@ -4,6 +4,8 @@ import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
 import 'description.dart';
+import '../../../../data/models/progress_general.dart';
+import '../../../../data/controllers/progress_form.dart';
 
 class GeneralPage extends StatefulWidget {
   const GeneralPage({super.key});
@@ -16,11 +18,10 @@ class _GeneralPageState extends State<GeneralPage> {
   // form
   final _formKey = GlobalKey<FormState>();
   final _orderSaleCtrl = TextEditingController();
-  final _obraCtrl = TextEditingController();
   final _workplaceCtrl = TextEditingController();
   final _quoteNumber = TextEditingController();
   bool _isRFQ = false;
-  String? _especialidad;
+  String? _especialty;
 
   // progress bar form 
   static const steps = [
@@ -34,19 +35,29 @@ class _GeneralPageState extends State<GeneralPage> {
   @override
   void dispose() {
     _orderSaleCtrl.dispose();
-    _obraCtrl.dispose();
     _workplaceCtrl.dispose();
     _quoteNumber.dispose();
     super.dispose();
   }
 
   void _submit() {
-    // final ok = _formKey.currentState?.validate() ?? false;
-    // if (!ok) return;
+    final ok = _formKey.currentState?.validate() ?? false;
+    if (!ok) return;
+
     // _formKey.currentState?.save();
+
+    final general = ProgressGeneral(
+      orderSale: _orderSaleCtrl.text.trim(),
+      workPlace: _workplaceCtrl.text.trim(),
+      quoteNumber: _isRFQ ? _quoteNumber.text.trim() : '',
+      rfq: _isRFQ ? 'RFQ' : 'OR',
+      especialty: _especialty ?? '',
+    );
+    ProgressFormController.instance.general = general;
+    
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const DescriptionPage()),
+      MaterialPageRoute(builder: (context) => DescriptionPage(general: general)),
     );
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Formulario válido. Continuando…')),
@@ -170,22 +181,6 @@ class _GeneralPageState extends State<GeneralPage> {
                           ),
                           const SizedBox(height: 20),
 
-                          // Obra
-                          Text(
-                            'Obra',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const SizedBox(height: 6),
-                          fieldContainer(
-                            child: TextFormField(
-                              controller: _obraCtrl,
-                              decoration: inputDec('Obra'),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty) ? 'Ingrese la obra' : null,
-                            ),
-                          ),
-                          const SizedBox(height: 25),
-
                           // Centro de trabajo
                           Text(
                             'Centro de trabajo',
@@ -203,7 +198,7 @@ class _GeneralPageState extends State<GeneralPage> {
                           ),
                           const SizedBox(height: 25),
 
-                          // Especialidad del trabajo (dropdown) con mismo estilo
+                          // especialty del trabajo (dropdown) con mismo estilo
                           Text(
                             'Especialidad del trabajo',
                             style: Theme.of(context).textTheme.bodyLarge,
@@ -211,7 +206,7 @@ class _GeneralPageState extends State<GeneralPage> {
                           const SizedBox(height: 6),
                           fieldContainer(
                             child: DropdownButtonFormField<String>(
-                              value: _especialidad,
+                              value: _especialty,
                               decoration: inputDec('Especialidad del trabajo'),
                               items: const [
                                 DropdownMenuItem(value: 'Civil', child: Text('Civil')),
@@ -219,7 +214,7 @@ class _GeneralPageState extends State<GeneralPage> {
                                 DropdownMenuItem(value: 'Mecánica', child: Text('Mecánica')),
                                 DropdownMenuItem(value: 'Instrumentación', child: Text('Instrumentación')),
                               ],
-                              onChanged: (v) => setState(() => _especialidad = v),
+                              onChanged: (v) => setState(() => _especialty = v),
                               validator: (v) => v == null ? 'Seleccione una especialidad' : null,
                             ),
                           ),

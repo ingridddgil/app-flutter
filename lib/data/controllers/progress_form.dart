@@ -3,7 +3,7 @@ import '../models/progress_description.dart';
 import '../models/progress_activity.dart';
 import '../models/progress_personnel.dart';
 import '../models/progress_issues.dart';
-import '../models/progress_details_data.dart';
+import '../models/progress_data.dart';
 
 
 

@@ -17,25 +17,25 @@ class ProgressDescription {
     required this.license,
   });
 
-  // ProgressDescription copyWith({
-  //   String? companyPremises,
-  //   DateTime? startTime,
-  //   DateTime? endTime,
-  //   String? clientSupervisor,
-  //   String? supervisor,
-  //   String? workArea,
-  //   String? license,
-  // }) {
-  //   return ProgressDescription(
-  //     companyPremises: companyPremises ?? this.companyPremises,
-  //     startTime: startTime ?? this.startTime,
-  //     endTime: endTime ?? this.endTime,
-  //     clientSupervisor: clientSupervisor ?? this.clientSupervisor,
-  //     supervisor: supervisor ?? this.supervisor,
-  //     workArea: workArea ?? this.workArea,
-  //     license: license ?? this.license,
-  //   );
-  // }
+  ProgressDescription copyWith({
+    String? companyPremises,
+    DateTime? startTime,
+    DateTime? endTime,
+    String? clientSupervisor,
+    String? supervisor,
+    String? workArea,
+    String? license,
+  }) {
+    return ProgressDescription(
+      companyPremises: companyPremises ?? this.companyPremises,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      clientSupervisor: clientSupervisor ?? this.clientSupervisor,
+      supervisor: supervisor ?? this.supervisor,
+      workArea: workArea ?? this.workArea,
+      license: license ?? this.license,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'companyPremises': companyPremises,

@@ -38,4 +38,28 @@ class ProgressData {
       issue: issue ?? this.issue,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'general': general.toJson(),
+    'description': description.toJson(),
+    'activity': activity.map((a) => a.toJson()).toList(),
+    'personnel': personnel.map((p) => p.toJson()).toList(),
+    'issue': issue.toJson(),
+  };
+
+  factory ProgressData.fromJson(Map<String, dynamic> json) {
+    return ProgressData(
+      id: json['id'] ?? '',
+      general: ProgressGeneral.fromJson(json['general']),
+      description: ProgressDescription.fromJson(json['description']),
+      activity: (json['activity'] as List<dynamic>? ?? [])
+          .map((e) => ProgressActivity.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      personnel: (json['personnel'] as List<dynamic>? ?? [])
+          .map((e) => ProgressPersonnel.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      issue: ProgressIssues.fromJson(json['issue']),
+    );
+  }
 }

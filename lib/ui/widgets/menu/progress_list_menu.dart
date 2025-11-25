@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/data/models/progress_details_data.dart';
+import 'package:flutter_demo/data/models/progress_data.dart';
 import 'package:flutter_demo/data/repositories/progress_repository.dart';
 import '../cards/card_item_progress.dart';
 import '../buttons/status_tag.dart';
@@ -56,7 +56,7 @@ class _ProgressListMenuState extends State<ProgressListMenu> {
   Color _headerColorFromProgress(double percent) {
     // percent viene 0.0 a 1.0
     if (percent >= 1.0) return Colors.green;
-    if (percent > 0.0) return const Color.fromARGB(255, 26, 124, 205);
+    if (percent > 0.0) return  Color.fromARGB(255, 42, 125, 192);
     return const Color(0xFFE2BC28); // pendiente / borrador
   }
 

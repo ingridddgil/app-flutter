@@ -1,5 +1,3 @@
-import 'package:flutter_demo/data/models/progress_activity.dart';
-
 class ProgressGeneral {
   final String orderSale;
   final String workPlace;
@@ -15,21 +13,21 @@ class ProgressGeneral {
     required this.especialty,
   });
 
-//   ProgressGeneral copyWith({
-//   String? orderSale,
-//   String? workPlace,
-//   String? quoteNumber,
-//   String? rfq,
-//   String? especialty,
-// }) {
-//   return ProgressGeneral(
-//     orderSale: orderSale ?? this.orderSale,
-//     workPlace: workPlace ?? this.workPlace,
-//     quoteNumber: quoteNumber ?? this.quoteNumber,
-//     rfq: rfq ?? this.rfq,
-//     especialty: especialty ?? this.especialty,
-//   );
-// }
+  ProgressGeneral copyWith({
+    String? orderSale,
+    String? workPlace,
+    String? quoteNumber,
+    String? rfq,
+    String? especialty,
+  }) {
+    return ProgressGeneral(
+      orderSale: orderSale ?? this.orderSale,
+      workPlace: workPlace ?? this.workPlace,
+      quoteNumber: quoteNumber ?? this.quoteNumber,
+      rfq: rfq ?? this.rfq,
+      especialty: especialty ?? this.especialty,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'orderSale': orderSale,
@@ -39,13 +37,13 @@ class ProgressGeneral {
     'especialty': especialty,
   };
 
-  factory ProgressGeneral.fromJson(Map<String, dynamic> json){
+  factory ProgressGeneral.fromJson(Map<String, dynamic> json) {
     return ProgressGeneral(
-      orderSale: json['orderSale'], 
-      workPlace: json['workPlace'], 
-      quoteNumber: json['quoteNumber'], 
-      rfq: json['rfq'], 
-      especialty: json['especialty']
+      orderSale: json['orderSale'] ?? '',
+      workPlace: json['workPlace'] ?? '',
+      quoteNumber: json['quoteNumber'] ?? '',
+      rfq: json['rfq'] ?? '',
+      especialty: json['especialty'] ?? '',
     );
   }
 }

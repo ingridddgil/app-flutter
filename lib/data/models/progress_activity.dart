@@ -23,32 +23,32 @@ class ProgressActivity {
     required this.cumulativePercentage,
   });
 
-  // ProgressActivity copyWith({
-  //   String? task,
-  //   String? detail,
-  //   double? quantityExecuted,
-  //   double? quantityRequested,
-  //   double? quantityRemaining,
-  //   double? amountTotal,
-  //   double? amountRemaining,
-  //   double? amountDisbursed,
-  //   double? percentageProgress,
-  //   double? cumulativePercentage,  
-  // }) {
-  //   return ProgressActivity(
-  //     task: task ?? this.task,
-  //     detail: detail ?? this.detail,
-  //     quantityExecuted: quantityExecuted ?? this.quantityExecuted,
-  //     quantityRequested: quantityRequested ?? this.quantityRequested,
-  //     quantityRemaining: quantityRemaining ?? this.quantityRemaining,
-  //     amountTotal: amountTotal ?? this.amountTotal,
-  //     amountRemaining: amountRemaining ?? this.amountRemaining,
-  //     amountDisbursed: amountDisbursed ?? this.amountDisbursed,
-  //     percentageProgress: percentageProgress ?? this.percentageProgress,
-  //     cumulativePercentage: cumulativePercentage ?? this.cumulativePercentage,
-  //   );
-  // }
-  
+  ProgressActivity copyWith({
+    String? task,
+    String? detail,
+    double? quantityExecuted,
+    double? quantityRequested,
+    double? quantityRemaining,
+    double? amountTotal,
+    double? amountRemaining,
+    double? amountDisbursed,
+    double? percentageProgress,
+    double? cumulativePercentage,  
+  }) {
+    return ProgressActivity(
+      task: task ?? this.task,
+      detail: detail ?? this.detail,
+      quantityExecuted: quantityExecuted ?? this.quantityExecuted,
+      quantityRequested: quantityRequested ?? this.quantityRequested,
+      quantityRemaining: quantityRemaining ?? this.quantityRemaining,
+      amountTotal: amountTotal ?? this.amountTotal,
+      amountRemaining: amountRemaining ?? this.amountRemaining,
+      amountDisbursed: amountDisbursed ?? this.amountDisbursed,
+      percentageProgress: percentageProgress ?? this.percentageProgress,
+      cumulativePercentage: cumulativePercentage ?? this.cumulativePercentage,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'task': task,
     'detail': detail,

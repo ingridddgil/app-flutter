@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/ui/widgets/buttons/three_dot_menu.dart';
 import 'package:flutter_demo/ui/widgets/form/progress/general.dart';
+import 'package:flutter_demo/data/repositories/progress_repository.dart';
+import 'package:flutter_demo/data/controllers/progress_form.dart';
+
 class CardItemProgress extends StatelessWidget {
   final String id;
   final DateTime date;
@@ -90,6 +93,23 @@ class CardItemProgress extends StatelessWidget {
 
                     ThreeDotMenu(
                       onEdit: () {
+                        // 1. Get the record from local repository using this card's id
+                        final repo = ProgressRepository.instance;
+                        final data = repo.getById(id);
+
+                        if (data == null) {
+                          // Optional: show something if not found
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('No se encontró el registro para editar')),
+                          );
+                          return;
+                        }
+
+                        // 2. Load the data into the form controller -> enters EDIT MODE
+                        final form = ProgressFormController.instance;
+                        form.loadFrom(data);
+
+                        // 3. Start the wizard at the first step
                         Navigator.push(
                           context,
                           MaterialPageRoute(

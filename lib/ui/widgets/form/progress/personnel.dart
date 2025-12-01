@@ -10,6 +10,7 @@ import '../../form/progress/issues.dart';
 import '../../../../data/remote/odoo_client.dart'; 
 import '../../../../data/models/employee_data.dart';
 import '../../../../env.dart';
+import '../../../../data/controllers/progress_form.dart'; 
 
 
 class PersonnelPage extends StatefulWidget {
@@ -30,6 +31,8 @@ class _PersonnelPageState extends State<PersonnelPage> {
 
   final List<EmployeeData> _allPeople = [];
 
+  final form = ProgressFormController.instance;
+
   // Odoo client instance 
   late final OdooClient _odoo;
   final List<EmployeeData> _assigned = [];
@@ -47,18 +50,17 @@ class _PersonnelPageState extends State<PersonnelPage> {
     _loadEmployees();
   }
 
-Future<void> _loadEmployees() async {
+  Future<void> _loadEmployees() async {
   debugPrint(pink('_loadEmployees() started'));
-  
+
   try {
     debugPrint(pink('Attempting authentication...'));
-    final loggedIn = await _odoo.authenticate('admin', 'admin'); 
+    final loggedIn = await _odoo.authenticate('admin', 'admin');
     debugPrint(pink('Authentication result: $loggedIn'));
-    
+
     if (!loggedIn) {
       debugPrint(red('No se pudo autenticar'));
-      
-      // Mostrar error en pantalla
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -90,24 +92,21 @@ Future<void> _loadEmployees() async {
 
     final employees = raw.map((e) {
       debugPrint(pink('Processing employee: $e'));
-      
+
       String category = 'Sin categoría';
-      
-      // Manejo seguro de job_title
+
       final jobTitle = e['job_title'];
       debugPrint(pink('  job_title value: $jobTitle (type: ${jobTitle.runtimeType})'));
-      
+
       if (jobTitle is String && jobTitle.trim().isNotEmpty) {
         category = jobTitle.trim();
       } else {
         final jobId = e['job_id'];
-        debugPrint(pink('  $jobId (type: ${jobId.runtimeType})'));
+        debugPrint(pink('  job_id value: $jobId (type: ${jobId.runtimeType})'));
 
         if (jobId is List && jobId.length >= 2 && jobId[1] is String) {
           final jobName = (jobId[1] as String).trim();
-          if (jobName.isNotEmpty) {
-           category = jobName;
-          }
+          if (jobName.isNotEmpty) category = jobName;
         }
       }
 
@@ -120,21 +119,61 @@ Future<void> _loadEmployees() async {
 
     debugPrint(pink('Employees processed: ${employees.length}'));
     for (final e in employees) {
-      debugPrint(pink('   Employee: id=${e.id}, name=${e.name}, category=${e.category}'));
+      debugPrint(
+        pink('   Employee: id=${e.id}, name=${e.name}, category=${e.category}'),
+      );
     }
-
     setState(() {
       _allPeople
         ..clear()
         ..addAll(employees);
     });
-    
+
     debugPrint(pink('setState completed, _allPeople.length = ${_allPeople.length}'));
+    final form = ProgressFormController.instance;
+    final existing = form.personnel;
+
+    debugPrint(pink('Checking edit mode: existing personnel = ${existing.length}'));
+
+    if (existing.isNotEmpty) {
+      debugPrint(pink('Edit mode detected — pre-selecting employees...'));
+
+      final byId = {
+        for (final e in _allPeople) e.id.toString(): e,
+      };
+
+      _assigned
+        ..clear()
+        ..addAll(
+          existing.map((p) {
+            final match = byId[p.id];
+            if (match != null) {
+              debugPrint(pink('Reassigning match for id=${p.id}: ${match.name}'));
+              return match;
+            }
+
+            debugPrint(
+              pink('Employee id=${p.id} not in Odoo list, creating fallback object'),
+            );
+            return EmployeeData(
+              id: int.tryParse(p.id) ?? -1,
+              name: p.name,
+              category: p.category,
+            );
+          }),
+        );
+
+      debugPrint(pink('_assigned restored with ${_assigned.length} employees'));
+    } else {
+      debugPrint(pink('Not editing OR no personnel found — nothing to pre-select'));
+    }
+
+    if (mounted) setState(() {});
 
   } catch (e, stackTrace) {
     debugPrint(pink('ERROR in _loadEmployees: $e'));
     debugPrint(pink('Stack trace: $stackTrace'));
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -146,7 +185,6 @@ Future<void> _loadEmployees() async {
     }
   }
 }
-
 
   static const steps = [
     StepItem(icon: Icons.info_outline, label: 'General'),
@@ -163,23 +201,32 @@ Future<void> _loadEmployees() async {
   }
 
   void _submit() {
-
     final personnel = _assigned.map((e) {
       return ProgressPersonnel(
         id: e.id.toString(),
-        name: e.name.toString(),
-        category: e.category.toString(),
+        name: e.name,
+        category: e.category,
         normalHours: 0.0,
       );
     }).toList();
-    Navigator.push(context,
-      MaterialPageRoute(builder: (_) => IssuesPage(personnel: personnel)),
+
+    // store in form so IssuesPage can see them too
+    form.personnel
+      ..clear()
+      ..addAll(personnel);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => IssuesPage(personnel: personnel),
+      ),
     );
-    // Later: navigate to ContratiemposPage
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Personal guardado. Continúe al siguiente paso.')),
+      const SnackBar(content: Text('Form is valid. Continuing…')),
     );
   }
+
 
   // filter to search employees
   List<EmployeeData> get _filteredPeople {

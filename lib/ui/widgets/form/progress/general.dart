@@ -33,6 +33,22 @@ class _GeneralPageState extends State<GeneralPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+
+    final form = ProgressFormController.instance;
+    final saved = form.general;
+
+    if (saved != null) {
+      _orderSaleCtrl.text = saved.orderSale;
+      _workplaceCtrl.text = saved.workPlace;
+      _quoteNumber.text = saved.quoteNumber;
+      _especialty = saved.especialty;
+      _isRFQ = saved.rfq == 'RFQ';
+    }
+  }
+
+  @override
   void dispose() {
     _orderSaleCtrl.dispose();
     _workplaceCtrl.dispose();
@@ -41,8 +57,8 @@ class _GeneralPageState extends State<GeneralPage> {
   }
 
   void _submit() {
-    final ok = _formKey.currentState?.validate() ?? false;
-    if (!ok) return;
+    // final ok = _formKey.currentState?.validate() ?? false;
+    // if (!ok) return;
 
     // _formKey.currentState?.save();
 

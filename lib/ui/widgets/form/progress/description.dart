@@ -34,7 +34,24 @@ class _DescriptionPageState extends State<DescriptionPage> {
     StepItem(icon: Icons.badge, label: 'Personal'),
     StepItem(icon: Icons.warning_amber, label: 'Contratiempos'),
   ];
-  
+   @override
+    void initState() {
+      super.initState();
+
+      final form = ProgressFormController.instance;
+      final saved = form.description;
+
+      if (saved != null) {
+      _companyPremises.text = saved.companyPremises;
+      _startTime.text = _formatHHmm(TimeOfDay.fromDateTime(saved.startTime));     
+      _endTime.text = _formatHHmm(TimeOfDay.fromDateTime(saved.endTime));       
+      _clientSupervisor.text = saved.clientSupervisor;
+      _supervisor.text = saved.supervisor;
+      _workArea.text = saved.workArea;
+      _license.text = saved.license;
+    }
+
+  }
   @override
   void dispose() {
     _companyPremises.dispose();
@@ -48,8 +65,8 @@ class _DescriptionPageState extends State<DescriptionPage> {
   }
 
   void _submit() {
-    final ok = _formKey.currentState?.validate() ?? false;
-    if (!ok) return;
+    // final ok = _formKey.currentState?.validate() ?? false;
+    // if (!ok) return;
 
     final sTod = _tryParseHHmm(_startTime.text.trim());
     final eTod = _tryParseHHmm(_endTime.text.trim());

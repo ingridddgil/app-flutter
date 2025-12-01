@@ -7,6 +7,9 @@ import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
 import '../../../screens/menu.dart';
 import '../../../../data/controllers/progress_form.dart';
+import '../../../../data/remote/odoo_client.dart';
+import '../../../../data/models/progress_data.dart';
+import '../../../../env.dart';
 
 class IssuesPage extends StatefulWidget {
   final List<ProgressPersonnel> personnel;
@@ -17,6 +20,7 @@ class IssuesPage extends StatefulWidget {
 }
 
 class _IssuesPageState extends State<IssuesPage> {
+  String pink(String msg) => "\x1B[38;2;255;105;180m$msg\x1B[0m";
   // Description form
   final _formKey = GlobalKey<FormState>();
   final _startTime = TextEditingController();
@@ -25,7 +29,8 @@ class _IssuesPageState extends State<IssuesPage> {
   String? _responsable;
   final form = ProgressFormController.instance;
   
-
+  late final OdooClient _odoo;
+  
   static const steps = [
     StepItem(icon: Icons.info_outline, label: 'General'),
     StepItem(icon: Icons.description, label: 'Descripción'),
@@ -33,6 +38,15 @@ class _IssuesPageState extends State<IssuesPage> {
     StepItem(icon: Icons.badge, label: 'Personal'),
     StepItem(icon: Icons.warning_amber, label: 'Contratiempos'),
   ];
+
+  @override
+  void initState(){
+    super.initState();
+    _odoo = OdooClient(
+      baseUrl: Env.url, 
+      dbName: Env.db
+    );
+  }
   
   @override
   void dispose() {
@@ -41,9 +55,12 @@ class _IssuesPageState extends State<IssuesPage> {
     _description.dispose();
     super.dispose();    
   }
-  void _submit() {
-    final ok = _formKey.currentState?.validate() ?? false;
-    if (!ok) return;
+  
+  Future<void> _submit() async {
+    // final ok = _formKey.currentState?.validate() ?? false;
+    // if (!ok) return;
+
+    // HH:mm -> TimeOfDay
     final sTod = _tryParseHHmm(_startTime.text.trim());
     final eTod = _tryParseHHmm(_endTime.text.trim());
     if (sTod == null || eTod == null) return;
@@ -51,13 +68,19 @@ class _IssuesPageState extends State<IssuesPage> {
     final date = DateTime.now();
 
     final startDt = DateTime(
-      date.year, date.month, date.day,
-      sTod.hour, sTod.minute,
+      date.year, 
+      date.month, 
+      date.day,
+      sTod.hour, 
+      sTod.minute,
     );
 
     final endDt = DateTime(
-      date.year, date.month, date.day,
-      eTod.hour, eTod.minute,
+      date.year, 
+      date.month, 
+      date.day,
+      eTod.hour, 
+      eTod.minute,
     );
 
     final issue = ProgressIssues(
@@ -66,13 +89,43 @@ class _IssuesPageState extends State<IssuesPage> {
       description: _description.text.trim(),
       responsable: _responsable ?? '',
     );
-
-    // ProgressFormController.instance.issues = issue;
     form.issues = issue;
-
+    
+    // it builds the whole progress record
     final progress = form.buildProgressData();
-    ProgressRepository.instance.add(progress);
 
+    // save locally
+    if (form.isEditing && form.editingId != null) {
+      await ProgressRepository.instance.updateById(form.editingId!, progress);
+    } else {
+      await ProgressRepository.instance.add(progress);
+    }
+
+    // save in Odoo
+    try {
+      //authentication
+      final loggedIn = await _odoo.authenticate('admin', 'admin');
+      if (!loggedIn) {
+        if (mounted){
+          debugPrint(pink('User\'s authentication failed'));
+        }
+      } else {
+        final values = _mapProgressToOdooValues(progress);
+        
+        if (form.isEditing){
+          // 
+        } else {
+          final newId = await _odoo.createRecord('creacion.avances', values);
+          debugPrint(pink('Registro creado en Odoo con ID $newId'));
+        }
+      }
+    } catch (e) {
+      debugPrint(pink('Error al guardar en Odoo $e'));
+      if (mounted){
+        debugPrint(pink('There was an error to save in Odoo'));
+      }
+    }
+     
     form.reset();
 
     Navigator.pushAndRemoveUntil(
@@ -80,6 +133,29 @@ class _IssuesPageState extends State<IssuesPage> {
       MaterialPageRoute(builder: (_) => const MenuPage(initialTab: 2)),
       (route) => false,
     );
+  }
+
+  Map<String, dynamic> _mapProgressToOdooValues(ProgressData pd){
+    return {
+      // general
+      'oc_pedido': pd.general.orderSale,
+      'ct': pd.general.workPlace,
+      'or_rfq': pd.general.quoteNumber,
+      'especialidad_trabajo': pd.general.especialty,
+
+      // description
+      'planta': pd.description.companyPremises,
+      'hora_inicio': pd.description.startTime,
+      'hora_termino': pd.description.endTime,
+      'supervisorplanta': pd.description.clientSupervisor,
+      'responsable_id': pd.description.supervisor,
+      'area_equipo': pd.description.workArea,
+      'licencia': pd.description.license,
+
+      // Avance
+      
+      // contratiempos 
+    };
   }
 
 

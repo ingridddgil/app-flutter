@@ -29,17 +29,27 @@ class ProgressRepository {
       );
   }
 
-  void add(ProgressData data) {
+  add(ProgressData data) {
     _items.add(data);
     _save();
   }
 
-  void updateById(String id, ProgressData newData) {
-    final index = _items.indexWhere((item) => item.id == id);
+  Future<void> updateById(String id, ProgressData newData) async {
+    final index = _items.indexWhere((e) => e.id == id);
     if (index == -1) return;
     _items[index] = newData;
-    _save();
+    await _save();
   }
+
+  ProgressData? getById(String id) {
+    try {
+      return _items.firstWhere((item) => item.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+
   
   void removeById(String id) {
     _items.removeWhere((item) => item.id == id);

@@ -5,6 +5,7 @@ import '../cards/card_item_progress.dart';
 import '../buttons/status_tag.dart';
 import '../form/progress/general.dart';
 import '../../../data/models/progress_activity.dart';
+import '../../../data/controllers/progress_form.dart';
 
 class ProgressListMenu extends StatefulWidget {
   const ProgressListMenu({super.key});
@@ -16,19 +17,19 @@ class ProgressListMenu extends StatefulWidget {
 class _ProgressListMenuState extends State<ProgressListMenu> {
   List<ProgressData> get _items => ProgressRepository.instance.getAll();
 
-  Future<void> _goToNewProgress() async {
-    final newItem = await Navigator.push<ProgressData>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const GeneralPage(),
-      ),
-    );
+    Future<void> _goToNewProgress() async {
+      // fresh start: no edit mode
+      ProgressFormController.instance.reset();
 
-    if (newItem != null) {
-      ProgressRepository.instance.add(newItem);
-      setState(() {});
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const GeneralPage(),
+        ),
+      );
     }
-  }
+
+
 
   // Progress average of an activity list
   double _avgProgress(List<ProgressActivity> list) {

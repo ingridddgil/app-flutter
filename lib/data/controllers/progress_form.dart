@@ -13,22 +13,47 @@ class ProgressFormController {
   final List<ProgressActivity> activities = [];
   final List<ProgressPersonnel> personnel = [];
   ProgressIssues? issues;
+  String? _editingId;
 
   // Singleton :D
-  static final ProgressFormController instance = ProgressFormController._();
-  ProgressFormController._();
+  ProgressFormController._internal();
+  static final ProgressFormController instance = ProgressFormController._internal();
 
-  void reset() {
+  bool get isEditing => _editingId != null;
+  String? get editingId => _editingId;
+
+  void loadFrom(ProgressData data) {
+    _editingId = data.id;
+    general = data.general;
+    description = data.description;
+
+    activities
+      ..clear()
+      ..addAll(data.activity);
+
+    personnel
+      ..clear()
+      ..addAll(data.personnel);
+
+    issues = data.issue;
+  }
+
+  void reset({bool keepEditingId = false}) {
     general = null;
     description = null;
     activities.clear();
     personnel.clear();
     issues = null;
-  } 
+
+    if (!keepEditingId) {
+      _editingId = null;
+    }
+  }
+
 
   ProgressData buildProgressData() {
     return ProgressData(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: _editingId ?? DateTime.now().millisecondsSinceEpoch.toString(),
       general: general!,
       description: description!,
       activity: List.unmodifiable(activities),

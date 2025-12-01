@@ -3,6 +3,8 @@ import 'package:flutter_demo/ui/widgets/buttons/three_dot_menu.dart';
 import 'package:flutter_demo/ui/widgets/form/progress/general.dart';
 import 'package:flutter_demo/data/repositories/progress_repository.dart';
 import 'package:flutter_demo/data/controllers/progress_form.dart';
+import 'package:flutter_demo/data/controllers/progress_form.dart';
+import 'package:flutter_demo/data/repositories/progress_repository.dart';
 
 class CardItemProgress extends StatelessWidget {
   final String id;
@@ -13,6 +15,7 @@ class CardItemProgress extends StatelessWidget {
   final Widget? actions;
   final Widget? status;
   final Color color;
+  final VoidCallback? onDeleted;
   
   const CardItemProgress({
     super.key,
@@ -24,6 +27,7 @@ class CardItemProgress extends StatelessWidget {
     required this.color,
     this.actions,
     this.status,
+    this.onDeleted,
   });
 
   String _formatDate(DateTime d) {
@@ -93,23 +97,20 @@ class CardItemProgress extends StatelessWidget {
 
                     ThreeDotMenu(
                       onEdit: () {
-                        // 1. Get the record from local repository using this card's id
+                        // Get the record from local repository using this card's id
                         final repo = ProgressRepository.instance;
                         final data = repo.getById(id);
 
                         if (data == null) {
-                          // Optional: show something if not found
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('No se encontró el registro para editar')),
                           );
                           return;
                         }
-
-                        // 2. Load the data into the form controller -> enters EDIT MODE
                         final form = ProgressFormController.instance;
                         form.loadFrom(data);
 
-                        // 3. Start the wizard at the first step
+                        // Start the wizard at the first step
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -127,14 +128,25 @@ class CardItemProgress extends StatelessWidget {
                               content: const Text('Esta acción es irreversible'),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () => Navigator.of(context).pop(), // cancel
                                   child: const Text(
                                     'Cancelar',
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                    await ProgressRepository.instance.removeById(id);
+
+                                    if (onDeleted != null){
+                                      onDeleted!();
+                                    } 
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Registro eliminado'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
                                   },
                                   child: const Text('Eliminar'),
                                 ),

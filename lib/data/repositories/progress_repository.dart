@@ -51,9 +51,9 @@ class ProgressRepository {
 
 
   
-  void removeById(String id) {
+  Future<void> removeById(String id) async {
     _items.removeWhere((item) => item.id == id);
-    _save();
+    await _save();
   }
 
   void clear() {

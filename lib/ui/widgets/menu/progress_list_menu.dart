@@ -17,19 +17,17 @@ class ProgressListMenu extends StatefulWidget {
 class _ProgressListMenuState extends State<ProgressListMenu> {
   List<ProgressData> get _items => ProgressRepository.instance.getAll();
 
-    Future<void> _goToNewProgress() async {
-      // fresh start: no edit mode
-      ProgressFormController.instance.reset();
+  Future<void> _goToNewProgress() async {
+    // fresh start: no edit mode
+    ProgressFormController.instance.reset();
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const GeneralPage(),
-        ),
-      );
-    }
-
-
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const GeneralPage(),
+      ),
+    );
+  }
 
   // Progress average of an activity list
   double _avgProgress(List<ProgressActivity> list) {
@@ -74,6 +72,10 @@ class _ProgressListMenuState extends State<ProgressListMenu> {
     return '';
   }
 
+  void _refreshList(){
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final items = _items;
@@ -112,6 +114,7 @@ class _ProgressListMenuState extends State<ProgressListMenu> {
                     color: Colors.white,
                     status: _getStatusText(headerColor),
                   ),
+                  onDeleted: _refreshList,
                 );
               },
             ),

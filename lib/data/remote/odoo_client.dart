@@ -30,6 +30,7 @@ class OdooClient {
 
       final payload = {
         'jsonrpc': '2.0',
+        'method': 'call',
         'params': {
           'db': dbName,
           'login': username,
@@ -39,7 +40,11 @@ class OdooClient {
 
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Accept-Encoding': 'identity'
+          },
         body: jsonEncode(payload),
       ).timeout(
         const Duration(seconds: 10),

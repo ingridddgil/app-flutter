@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/ui/widgets/buttons/three_dot_menu.dart';
 import '../widgets/buttons/tab_pill.dart';
 import '../widgets/menu/task_list_menu.dart';
 import '../widgets/menu/progress_list_menu.dart';
@@ -13,6 +14,32 @@ class MenuPage extends StatefulWidget {
 }
 
 class _ProgressPage extends State<MenuPage> {
+  final List<MenuOption> options = [
+                                    MenuOption(
+                                      label: 'Pedidos', 
+                                      // icon: icon,
+                                      // onTap: () {
+                                      //   Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //       builder: (_) => const PedidosPage();
+                                      //     ),
+                                      //   ),
+                                      // },
+                                    ),
+                                    MenuOption(
+                                      label: 'Control', 
+                                      // icon: icon,
+                                      // onTap: () {
+                                      //   Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //       builder: (_) => const PedidosPage();
+                                      //     ),
+                                      //   ),
+                                      // },
+                                    ),
+  ];
   late int sel; // 0 proyectos, 1 avances,
 
   @override
@@ -29,26 +56,39 @@ class _ProgressPage extends State<MenuPage> {
       // empieza la configuración del app bar //
 
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context), 
+          icon: Icon(Icons.arrow_back_ios), color: const Color(0xFF8B1E04)
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
-        title: SizedBox(
-          width: double.infinity,
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 235, 237, 237),
-              borderRadius: BorderRadius.circular(35),
-            ),
-            child: const TextField(
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search_sharp, size:27),
-                prefixIconColor: Colors.grey,
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 15),
+        title: Row (
+            children: [
+              Expanded (
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 235, 237, 237),
+                    borderRadius: BorderRadius.circular(35),
+                  ),
+                  child: const TextField(
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search_sharp, size:27),
+                      prefixIconColor: Colors.grey,
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 10),                
+                    ),
+                  ),
+                ),
               ),
-            ),
+              ThreeDotMenu(
+                color: const Color.fromARGB(255, 0, 0, 0),      
+                options: options,        
+              ),
+            ],
           ),
-        ),
-      ),
+        ), 
+
 
       // a partir de qui es el body con el switch y las "tarjetas" //
       body: SafeArea(
@@ -79,6 +119,7 @@ class _ProgressPage extends State<MenuPage> {
                       active: sel == 2,
                       onTap: () => setState(() => sel = 2)
                     ),
+                    
                   // ),
                   // const SizedBox(width: 8),
 

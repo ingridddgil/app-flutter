@@ -3,8 +3,6 @@ import 'package:flutter_demo/ui/widgets/buttons/three_dot_menu.dart';
 import 'package:flutter_demo/ui/widgets/form/progress/general.dart';
 import 'package:flutter_demo/data/repositories/progress_repository.dart';
 import 'package:flutter_demo/data/controllers/progress_form.dart';
-import 'package:flutter_demo/data/controllers/progress_form.dart';
-import 'package:flutter_demo/data/repositories/progress_repository.dart';
 
 class CardItemProgress extends StatelessWidget {
   final String id;
@@ -39,6 +37,74 @@ class CardItemProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<MenuOption> options = [
+                                      MenuOption(
+                                        label: 'Editar', 
+                                        icon: Icons.edit, 
+                                        onTap: () {
+                                          final repo = ProgressRepository.instance;
+                                          final data = repo.getById(id);
+
+                                          if (data == null) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('No se encontró el registro para editar')),
+                                            );
+                                            return;
+                                          }
+                                          final form = ProgressFormController.instance;
+                                          form.loadFrom(data);
+
+                                          // Start the wizard at the first step
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => const GeneralPage(),
+                                            ),
+                                          );
+                                        }
+                                      ),   
+                                      MenuOption(
+                                        label: 'Eliminar', 
+                                        icon: Icons.delete,
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                iconColor: Colors.white,
+                                                title: const Text('¿Está seguro que desea eliminar este registro?'),
+                                                content: const Text('Esta acción es irreversible'),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.of(context).pop(), // cancel
+                                                    child: const Text(
+                                                      'Cancelar',
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () async {
+                                                      Navigator.of(context).pop();
+                                                      await ProgressRepository.instance.removeById(id);
+
+                                                      if (onDeleted != null){
+                                                        onDeleted!();
+                                                      } 
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text('Registro eliminado'),
+                                                          backgroundColor: Colors.red,
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: const Text('Eliminar'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        }
+                                      ),
+                                    ];
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -94,78 +160,11 @@ class CardItemProgress extends StatelessWidget {
                             ),
                           ),
                         ),
-
-                    ThreeDotMenu(
-                      onEdit: () {
-                        // Get the record from local repository using this card's id
-                        final repo = ProgressRepository.instance;
-                        final data = repo.getById(id);
-
-                        if (data == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('No se encontró el registro para editar')),
-                          );
-                          return;
-                        }
-                        final form = ProgressFormController.instance;
-                        form.loadFrom(data);
-
-                        // Start the wizard at the first step
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const GeneralPage(),
-                          ),
-                        );
-                      },
-                      onDelete: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              iconColor: Colors.white,
-                              title: const Text('¿Está seguro que desea eliminar este registro?'),
-                              content: const Text('Esta acción es irreversible'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(), // cancel
-                                  child: const Text(
-                                    'Cancelar',
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    await ProgressRepository.instance.removeById(id);
-
-                                    if (onDeleted != null){
-                                      onDeleted!();
-                                    } 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Registro eliminado'),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  },
-                                  child: const Text('Eliminar'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
+                        ThreeDotMenu(
+                          color: Colors.white,      
+                          options: options,        
+                        ), 
                   ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  id,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                  ),
                 ),
               ],
             ),

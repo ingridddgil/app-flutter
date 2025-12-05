@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/ui/styles/styles.dart';
 
 @immutable
 class StepItem {
@@ -30,7 +31,7 @@ class StepProgressBar extends StatelessWidget {
     super.key,
     required this.steps,
     required this.currentIndex,
-    this.activeColor = const Color(0xFF8B1E04),
+    this.activeColor = brand,
     this.inactiveColor = const Color.fromRGBO(28, 27, 31, 0.55),
     this.activeTextColor = Colors.black,
     this.inactiveTextColor = const Color.fromRGBO(0, 0, 0, 0.55),

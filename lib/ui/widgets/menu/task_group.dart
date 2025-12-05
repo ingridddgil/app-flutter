@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../styles/progress_bar_form_theme.dart';
+import 'package:flutter_demo/ui/styles/styles.dart';
 import '../../../data/models/progress_activity.dart';
+
 
 
 class TaskGroup extends StatefulWidget {

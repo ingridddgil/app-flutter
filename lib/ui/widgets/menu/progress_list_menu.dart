@@ -6,6 +6,7 @@ import '../buttons/status_tag.dart';
 import '../form/progress/general.dart';
 import '../../../data/models/progress_activity.dart';
 import '../../../data/controllers/progress_form.dart';
+import 'package:flutter_demo/ui/styles/styles.dart';
 
 class ProgressListMenu extends StatefulWidget {
   const ProgressListMenu({super.key});
@@ -87,7 +88,7 @@ class _ProgressListMenuState extends State<ProgressListMenu> {
         backgroundColor: Colors.white,
         child: const Icon(
           Icons.add, 
-          color: Color(0xFF8B1E04),
+          color: brand,
         ),
       ),
       body: items.isEmpty

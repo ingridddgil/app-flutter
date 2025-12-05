@@ -12,7 +12,7 @@ class AppOdoo extends StatelessWidget {
       title: 'Odoo app',
       theme: ThemeData (
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF8B1E04))
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF8B1E04))
       ),
       initialRoute: AppRoutes.home,
       routes: AppRoutes.routes,

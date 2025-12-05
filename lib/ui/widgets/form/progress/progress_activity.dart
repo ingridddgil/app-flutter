@@ -10,6 +10,8 @@ import '../../../../data/models/progress_activity.dart';
 import '../../menu/task_group.dart';
 import '../../../../data/controllers/progress_form.dart';
 
+import 'package:flutter_demo/ui/styles/styles.dart';
+
 class ProgressActivityPage extends StatefulWidget {
   final ProgressDescription description;
   const ProgressActivityPage({super.key, required this.description});

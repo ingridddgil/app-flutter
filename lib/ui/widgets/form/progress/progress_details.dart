@@ -4,6 +4,7 @@ import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../../styles/progress_bar_form_theme.dart';
 import '../../../../data/models/progress_activity.dart';
+import 'package:flutter_demo/ui/styles/styles.dart';
 
 class ProgressDetailsPage extends StatefulWidget {
   final ProgressActivity? initial;

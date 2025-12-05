@@ -4,7 +4,6 @@ import '../widgets/buttons/tab_pill.dart';
 import '../widgets/menu/task_list_menu.dart';
 import '../widgets/menu/progress_list_menu.dart';
 import '../widgets/menu/project_list_menu.dart';
-
 class MenuPage extends StatefulWidget {
   final int initialTab;
   const MenuPage({super.key, this.initialTab = 0});

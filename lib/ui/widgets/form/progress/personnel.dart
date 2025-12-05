@@ -10,7 +10,8 @@ import '../../form/progress/issues.dart';
 import '../../../../data/remote/odoo_client.dart'; 
 import '../../../../data/models/employee_data.dart';
 import '../../../../env.dart';
-import '../../../../data/controllers/progress_form.dart'; 
+import '../../../../data/controllers/progress_form.dart';
+import 'package:flutter_demo/ui/styles/styles.dart'; 
 
 
 class PersonnelPage extends StatefulWidget {

@@ -6,6 +6,7 @@ import '../../../styles/progress_bar_form_theme.dart';
 import 'progress_activity.dart';
 import '../../../../data/models/progress_general.dart';
 import '../../../../data/controllers/progress_form.dart';
+import 'package:flutter_demo/ui/styles/styles.dart';
 
 class DescriptionPage extends StatefulWidget {
   final ProgressGeneral general;

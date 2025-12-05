@@ -1,9 +1,8 @@
 // progress_bar_form_theme.dart
 import 'package:flutter/material.dart';
+import 'styles.dart';
 
 // styles
-const Color brand  = Color(0xFF8B1E04);                    // focus/active border
-const Color line   = Color.fromARGB(255, 229, 229, 229);   // soft dividers
 const double radius = 5;
 
 // Label stays outside the field (so it never floats). This only styles the box.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/ui/styles/styles.dart';
 
 class ProgressBar extends StatelessWidget {
   final double progress;
@@ -27,7 +28,7 @@ class ProgressBar extends StatelessWidget {
           LinearProgressIndicator(
             value: progress,
             minHeight: height,
-            color: Color(0xFF8B1E04),
+            color: brand,
             backgroundColor: Colors.grey[300],
             borderRadius: BorderRadius.circular(8),
           ),

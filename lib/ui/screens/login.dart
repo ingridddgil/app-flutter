@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/ui/styles/styles.dart';
+import 'package:flutter_demo/data/remote/odoo_client.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,8 +10,20 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
-  bool _showPassword = false;
+  
+  String pink(String msg) => "\x1B[38;2;255;105;180m$msg\x1B[0m";
+
+  final bool _showPassword = false;
   bool _remember = false;
+  final TextEditingController _user = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _user.dispose();
+    _password.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +110,7 @@ class LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 8),
                           TextField(
+                            controller: _user,
                             decoration: InputDecoration(
                               isDense: true,
                               filled: true,
@@ -141,6 +155,7 @@ class LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 8),
                           TextField(
+                            controller: _password,
                             obscureText: !_showPassword,
                             decoration: InputDecoration(
                               isDense: true,
@@ -180,9 +195,7 @@ class LoginPageState extends State<LoginPage> {
                                   color: Colors.grey[500],
                                 ),
                                 onPressed: () {
-                                  setState(() {
-                                    _showPassword = !_showPassword;
-                                  });
+                                
                                 },
                               ),
                             ),
@@ -253,9 +266,33 @@ class LoginPageState extends State<LoginPage> {
                                 ),
                                 elevation: 0,
                               ),
-                              onPressed: () {
-                                // TODO: lógica de login
-                              },
+                               onPressed: () async {
+                                  final username = _user.text.trim();
+                                  final password = _password.text.trim();
+
+                                  final success = await OdooClient.instance.authenticate(username, password);
+                                  if (success) {
+                                    Navigator.pushReplacementNamed(context, 'menu');
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        iconColor: Colors.white,
+                                        title: const Text('Error'),
+                                        content: const Text('No se puede autenticar'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(), 
+                                            child: const Text(
+                                              'Entendido',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    debugPrint(pink('Error al iniciar sesión'));
+                                  }
+                                },
                               child: const Text(
                                 'Iniciar sesión',
                                 style: TextStyle(

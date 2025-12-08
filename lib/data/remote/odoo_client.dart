@@ -3,25 +3,22 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'package:flutter_demo/env.dart';
 
 
 class OdooClient {
-  final String baseUrl;
-  final String dbName;
-
-  String? _sessionId;
-
   String green(String msg) => "\x1B[32m$msg\x1B[0m";
   String red(String msg)   => "\x1B[31m$msg\x1B[0m";
   String yellow(String msg)=> "\x1B[33m$msg\x1B[0m";
   String pink(String msg) => "\x1B[38;2;255;105;180m$msg\x1B[0m";
 
-  OdooClient({
-    required this.baseUrl,
-    required this.dbName,
-  }) {
-    debugPrint(pink('OdooClient initialized with baseUrl: $baseUrl, db: $dbName'));
-  }
+  OdooClient._internal();
+  static final OdooClient instance = OdooClient._internal();
+
+  final String baseUrl = Env.url;
+  final String dbName = Env.db;
+  String? _sessionId;
+
 
   Future<bool> authenticate(String username, String password) async {
     try {
@@ -43,7 +40,7 @@ class OdooClient {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Accept-Encoding': 'identity'
+          // 'Accept-Encoding': 'identity'
           },
         body: jsonEncode(payload),
       ).timeout(
@@ -207,6 +204,16 @@ class OdooClient {
         'kwargs': {},
       },
     };
+
+    final headers = <String, String> {
+      'Content-Type': 'application/json',
+    };
+    if (_sessionId != null) {
+      headers['Cookie'] = 'session_id=$_sessionId';
+    } else {
+      debugPrint(yellow('Warning: creating record WITHOUT session_id'));
+    }
+    
     final res = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},

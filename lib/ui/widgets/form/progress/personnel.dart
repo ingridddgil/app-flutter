@@ -8,8 +8,7 @@ import '../../header_form.dart';
 import '../../progress_bar_form.dart';
 import '../../form/progress/issues.dart';
 import '../../../../data/remote/odoo_client.dart'; 
-import '../../../../data/models/employee_data.dart';
-import '../../../../env.dart';
+import '../../../../data/models/employee_data.dart'; 
 import '../../../../data/controllers/progress_form.dart';
 import 'package:flutter_demo/ui/styles/styles.dart'; 
 
@@ -35,7 +34,6 @@ class _PersonnelPageState extends State<PersonnelPage> {
   final form = ProgressFormController.instance;
 
   // Odoo client instance 
-  late final OdooClient _odoo;
   final List<EmployeeData> _assigned = [];
   final Set<int> _selectedIds = {};
   final Map<int, Uint8List> _signatures = {};
@@ -43,11 +41,6 @@ class _PersonnelPageState extends State<PersonnelPage> {
   @override
   void initState(){
     super.initState();
-
-    _odoo = OdooClient(
-      baseUrl: Env.url,
-      dbName: Env.db,
-    );
     _loadEmployees();
   }
 
@@ -55,26 +48,26 @@ class _PersonnelPageState extends State<PersonnelPage> {
   debugPrint(pink('_loadEmployees() started'));
 
   try {
-    debugPrint(pink('Attempting authentication...'));
-    final loggedIn = await _odoo.authenticate('admin', 'admin');
-    debugPrint(pink('Authentication result: $loggedIn'));
+    // debugPrint(pink('Attempting authentication...'));
+    // final loggedIn = await _odoo.authenticate('admin', 'admin');
+    // debugPrint(pink('Authentication result: $loggedIn'));
 
-    if (!loggedIn) {
-      debugPrint(red('No se pudo autenticar'));
+    // if (!loggedIn) {
+    //   debugPrint(red('No se pudo autenticar'));
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error: No se pudo autenticar en Odoo'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      return;
-    }
+    //   if (mounted) {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //         content: Text('Error: No se pudo autenticar en Odoo'),
+    //         backgroundColor: Colors.red,
+    //       ),
+    //     );
+    //   }
+    //   return;
+    // }
 
     debugPrint(pink('Fetching personnel data...'));
-    final raw = await _odoo.fetchPersonnelRaw();
+    final raw = await OdooClient.instance.fetchPersonnelRaw();
     debugPrint(pink('Raw data received: ${raw.length} records'));
     debugPrint(pink('First record (if any): ${raw.isNotEmpty ? raw.first : "empty"}'));
 

@@ -9,7 +9,6 @@ import '../../../screens/menu.dart';
 import '../../../../data/controllers/progress_form.dart';
 import '../../../../data/remote/odoo_client.dart';
 import '../../../../data/models/progress_data.dart';
-import '../../../../env.dart';
 import 'package:flutter_demo/ui/styles/styles.dart';
 
 class IssuesPage extends StatefulWidget {
@@ -43,10 +42,6 @@ class _IssuesPageState extends State<IssuesPage> {
   @override
   void initState(){
     super.initState();
-    _odoo = OdooClient(
-      baseUrl: Env.url, 
-      dbName: Env.db
-    );
   }
   
   @override

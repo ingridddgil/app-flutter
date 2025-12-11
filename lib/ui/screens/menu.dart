@@ -148,7 +148,7 @@ class _ProgressPage extends State<MenuPage> {
   }
   Widget _buildContent(int sel){
     if (sel == 0) {
-      return const ProjectListMenu();
+      return const ProjectListMenuPage();
     } else if (sel == 1) {
       return const TaskListMenu(); // esta se cambia por la pantalla de tareas cuando haya
     } else {

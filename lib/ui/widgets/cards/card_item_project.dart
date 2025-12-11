@@ -2,18 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CardItemProject extends StatelessWidget {
-  final String title;
-  final String subtitle;
+  final String projectName;
+  final List<String> labelTasks = [];
+  final String partner;
+  final String company;
+  final String? superintendent;
+  final String? supervisor;
+  final String? coordinator;
+  final DateTime? startDate;
+  final double? allocatedHours;
+  final String? status;
   final Color color;
-  final String status;
 
-  const CardItemProject({
+  CardItemProject({
     super.key,
-    required this.title,
-    required this.subtitle,
+    required this.projectName,
+    required this.partner,
+    required this.company,  
+    this.superintendent,
+    this.supervisor,
+    this.coordinator,
+    this.startDate,
+    this.allocatedHours,
+    this.status,
     required this.color,
-    required this.status,
-  }); 
+  });
 
   @override
   Widget build(BuildContext context){
@@ -35,20 +48,29 @@ class CardItemProject extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              title,
+              projectName,
               style: GoogleFonts.poppins(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w500
-              )
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: GoogleFonts.poppins(
-                color: Colors.grey[700],
-              )
+            Row(
+              children: [
+                Text(
+                  partner,
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[700],
+                  )
+                ),
+                Text(
+                  company,
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[700],
+                  )
+                ),
+              ],
             ),
+
           ],
         ),
       ),

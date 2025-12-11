@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_demo/data/models/project_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_demo/env.dart';
@@ -18,6 +19,7 @@ class OdooClient {
   final String baseUrl = Env.url;
   final String dbName = Env.db;
   String? _sessionId;
+  int? _uid;
 
 
   Future<bool> authenticate(String username, String password) async {
@@ -40,7 +42,7 @@ class OdooClient {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          // 'Accept-Encoding': 'identity'
+          'Accept-Encoding': 'identity' // comment this line if issues with odoo conection 
           },
         body: jsonEncode(payload),
       ).timeout(
@@ -73,6 +75,8 @@ class OdooClient {
         debugPrint(red('No UID returned - authentication failed'));
         return false;
       }
+
+      _uid = uid;
 
       // Read session_id from Set-Cookie
       final cookies = response.headers['set-cookie'];
@@ -109,6 +113,38 @@ class OdooClient {
       return false;
     }
   }
+
+  int? getUid() => _uid;
+
+  Future<List<ProjectData>> fetchProjects() async {
+    final result = await callKw(
+      model: 'project.project',
+      method: 'search_read',
+      args: [
+        [
+          ['create_uid', '=', _uid],
+        ]
+      ],
+      kwargs: {
+        'fields': [
+          'name', 
+          'label_tasks', 
+          'partner_id', 
+          'company_id', 
+          'user_id', 
+          'supervisor', 
+          'coordinador', 
+          'date_start', 
+          'allocated_hours',
+          'state'
+          ]
+      },
+    );
+    
+    return List<ProjectData>.from(result as List);
+  }
+
+
 
   Future<dynamic> callKw({
     required String model,

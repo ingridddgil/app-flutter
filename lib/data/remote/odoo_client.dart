@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'package:flutter_demo/data/models/project_data.dart';
 import 'package:flutter_demo/env.dart';
 
 
@@ -189,6 +190,26 @@ class OdooClient {
       ],
     );
     return List<Map<String, dynamic>>.from(result as List);
+  }
+
+  Future<List<ProjectData>> fetchProjects() async {
+    final result = await callKw(
+      model: 'project.project',
+      method: 'search_read',
+      args: [
+        [],
+        ['id', 'name', 'partner_id', 'company_id'],
+      ],
+      kwargs: {
+        'limit': 50,
+        'order': 'create_date desc',
+      },
+    );
+
+    final projectMaps = List<Map<String, dynamic>>.from(result as List);
+    return projectMaps
+        .map((record) => ProjectData.fromOdoo(Map<String, dynamic>.from(record)))
+        .toList(growable: false);
   }
 
   Future<int> createRecord(String model, Map<String, dynamic> values) async {

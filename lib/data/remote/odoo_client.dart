@@ -198,7 +198,18 @@ class OdooClient {
       method: 'search_read',
       args: [
         [],
-        ['id', 'name', 'partner_id', 'company_id'],
+        [
+          'id',
+          'name',
+          'partner_id',
+          'company_id',
+          'user_id',
+          'supervisor',
+          'coordinador',
+          'date_start',
+          'allocated_hours',
+          'state',
+        ],
       ],
       kwargs: {
         'limit': 50,

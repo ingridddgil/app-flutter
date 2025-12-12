@@ -179,7 +179,8 @@ class OdooClient {
       final response = await _postJson(
         url,
         payload,
-        timeout: const Duration(seconds: 10),
+        // Odoo can take >10s under load; keep this comfortably above observed times.
+        timeout: const Duration(seconds: 30),
         includeCookie: false,
       );
 
@@ -288,7 +289,7 @@ class OdooClient {
       final response = await _postJson(
         url,
         payload,
-        timeout: const Duration(seconds: 20),
+        timeout: const Duration(seconds: 45),
         includeCookie: true,
       );
 

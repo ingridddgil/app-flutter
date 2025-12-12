@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_demo/data/models/project_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_demo/env.dart';
 
@@ -21,6 +22,44 @@ class OdooClient {
   String? _sessionId;
   int? _uid;
 
+  // Reuse one client so we don't constantly tear down connections.
+  // This avoids "connection closed" symptoms when the app does many calls.
+  late final http.Client _client = IOClient(
+    HttpClient()
+      ..connectionTimeout = const Duration(seconds: 15)
+      ..idleTimeout = const Duration(seconds: 30)
+      ..autoUncompress = true,
+  );
+
+  Map<String, String> _headers({bool includeCookie = true}) {
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      // Odoo + some reverse proxies occasionally misbehave with compression;
+      // using identity makes responses predictable.
+      'Accept-Encoding': 'identity',
+    };
+    if (includeCookie && _sessionId != null) {
+      headers['Cookie'] = 'session_id=$_sessionId';
+    }
+    return headers;
+  }
+
+  void _updateSessionFromResponse(http.Response response) {
+    final cookies = response.headers['set-cookie'];
+    if (cookies == null) return;
+
+    final parts = cookies.split(';');
+    for (final part in parts) {
+      final trimmed = part.trim();
+      if (trimmed.startsWith('session_id=')) {
+        _sessionId = trimmed.substring('session_id='.length);
+        debugPrint(green('Updated session_id: $_sessionId'));
+        break;
+      }
+    }
+  }
+
 
   Future<bool> authenticate(String username, String password) async {
     try {
@@ -37,13 +76,9 @@ class OdooClient {
         }
       };
 
-      final response = await http.post(
+      final response = await _client.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Accept-Encoding': 'identity' // comment this line if issues with odoo conection 
-          },
+        headers: _headers(includeCookie: false),
         body: jsonEncode(payload),
       ).timeout(
         const Duration(seconds: 10),
@@ -59,6 +94,8 @@ class OdooClient {
         debugPrint(red('Auth failed with status: ${response.statusCode}'));
         return false;
       }
+
+      _updateSessionFromResponse(response);
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final result = data['result'] as Map<String, dynamic>?;
@@ -77,22 +114,6 @@ class OdooClient {
       }
 
       _uid = uid;
-
-      // Read session_id from Set-Cookie
-      final cookies = response.headers['set-cookie'];
-      debugPrint(pink('Set-Cookie: $cookies'));
-
-      if (cookies != null) {
-        final parts = cookies.split(';');
-        for (final part in parts) {
-          final trimmed = part.trim();
-          if (trimmed.startsWith('session_id=')) {
-            _sessionId = trimmed.substring('session_id='.length);
-            debugPrint(green('Saved session_id: $_sessionId'));
-            break;
-          }
-        }
-      }
 
       return true;
     } on SocketException catch (e) {
@@ -166,19 +187,13 @@ class OdooClient {
         }
       };
 
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
-
-      if (_sessionId != null) {
-        headers['Cookie'] = 'session_id=$_sessionId';
-      } else {
+      if (_sessionId == null) {
         debugPrint(yellow('Warning: No session_id available'));
       }
 
-      final response = await http.post(
+      final response = await _client.post(
         url,
-        headers: headers,
+        headers: _headers(includeCookie: true),
         body: jsonEncode(payload),
       ).timeout(
         const Duration(seconds: 15),
@@ -193,6 +208,8 @@ class OdooClient {
       if (response.statusCode != 200) {
         throw Exception(red('HTTP error ${response.statusCode}'));
       }
+
+      _updateSessionFromResponse(response);
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
@@ -241,24 +258,26 @@ class OdooClient {
       },
     };
 
-    final headers = <String, String> {
-      'Content-Type': 'application/json',
-    };
-    if (_sessionId != null) {
-      headers['Cookie'] = 'session_id=$_sessionId';
-    } else {
+    if (_sessionId == null) {
       debugPrint(yellow('Warning: creating record WITHOUT session_id'));
     }
     
-    final res = await http.post(
+    final res = await _client.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: _headers(includeCookie: true),
       body: jsonEncode(payload),
+    ).timeout(
+      const Duration(seconds: 20),
+      onTimeout: () {
+        throw TimeoutException('Request timeout after 20 seconds');
+      },
     );
 
     if (res.statusCode != 200) {
       throw Exception('Error HTTP al crear registro: ${res.statusCode}');
     }
+
+    _updateSessionFromResponse(res);
 
     final data = jsonDecode(res.body);
 

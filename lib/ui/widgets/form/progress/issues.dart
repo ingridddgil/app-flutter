@@ -29,7 +29,7 @@ class _IssuesPageState extends State<IssuesPage> {
   String? _responsable;
   final form = ProgressFormController.instance;
   
-  late final OdooClient _odoo;
+  final OdooClient _odoo = OdooClient.instance;
   
   static const steps = [
     StepItem(icon: Icons.info_outline, label: 'General'),

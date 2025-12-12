@@ -1,6 +1,6 @@
 class ProjectData {
+  final int id;
   final String name;
-  final List<String> labelTasks = [];
   final String partner;
   final String company;
   final String superintendent;
@@ -10,7 +10,8 @@ class ProjectData {
   final double allocatedHours;
   final String status;
 
-  ProjectData({
+  const ProjectData({
+    required this.id,
     required this.name,
     required this.partner,
     required this.company,
@@ -22,36 +23,56 @@ class ProjectData {
     required this.status,
   });
 
-  factory ProjectData.fromJson(Map<String, dynamic> json) {
-  // helper para Many2one: [id, "Name"]
-  String _m2oName(dynamic field) {
-    if (field is List && field.length > 1) {
-      return field[1] as String;
+  factory ProjectData.fromOdoo(Map<String, dynamic> json) {
+    return ProjectData(
+      id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
+      name: (json['name'] ?? 'Proyecto sin nombre').toString(),
+      partner: _parseMany2One(json['partner_id']),
+      company: _parseMany2One(json['company_id']),
+      superintendent: _parseMany2One(json['user_id']),
+      supervisor: _parseMany2One(json['supervisor']),
+      coordinator: _parseMany2One(json['coordinador']),
+      startDate: _parseDate(json['date_start']),
+      allocatedHours: (json['allocated_hours'] as num?)?.toDouble() ?? 0.0,
+      status: json['state'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'partner': partner,
+        'company': company,
+        'superintendent': superintendent,
+        'supervisor': supervisor,
+        'coordinator': coordinator,
+        'startDate': startDate?.toIso8601String(),
+        'allocatedHours': allocatedHours,
+        'status': status,
+      };
+
+  static String _parseMany2One(dynamic value) {
+    if (value is List && value.length >= 2) {
+      return value[1]?.toString() ?? '';
+    }
+    if (value is Map<String, dynamic>) {
+      return value['name']?.toString() ?? '';
+    }
+    if (value is String) {
+      return value;
+    }
+    if (value is num) {
+      return value.toString();
     }
     return '';
   }
 
-  DateTime? _parseDate(dynamic value) {
-    if (value == null || value == '') return null;
-    try {
-      return DateTime.parse(value as String);
-    } catch (_) {
-      return null;
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String && value.isNotEmpty) {
+      return DateTime.tryParse(value);
     }
+    return null;
   }
-
-  return ProjectData(
-    name: json['name'] as String? ?? '',
-    partner: _m2oName(json['partner_id']),
-    company: _m2oName(json['company_id']),
-    superintendent: _m2oName(json['user_id']),
-    supervisor: json['supervisor'] as String? ?? '',
-    coordinator: json['coordinador'] as String? ?? '',
-    startDate: _parseDate(json['date_start']),
-    allocatedHours: (json['allocated_hours'] as num?)?.toDouble() ?? 0.0,
-    status: json['state'] as String? ?? '',
-  );
-}
-
-
 }

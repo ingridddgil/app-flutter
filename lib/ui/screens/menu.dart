@@ -40,11 +40,17 @@ class _ProgressPage extends State<MenuPage> {
                                     ),
   ];
   late int sel; // 0 proyectos, 1 avances,
+  late List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
     sel = widget.initialTab;
+    _pages = [
+      const ProjectListMenuPage(),
+      const TaskListMenu(),
+      const ProgressListMenu(),
+    ];
   }
 
   @override
@@ -137,7 +143,10 @@ class _ProgressPage extends State<MenuPage> {
 
               Expanded(
                 child: 
-                  _buildContent(sel),
+                  IndexedStack(
+                    index: sel,
+                    children: _pages,
+                  ),
                 // sel == 0 ? const ProjectList() : const ProgressList(),
               ),
             ],
@@ -145,16 +154,5 @@ class _ProgressPage extends State<MenuPage> {
         ),
       ),
     );
-  }
-  Widget _buildContent(int sel){
-    if (sel == 0) {
-      return const ProjectListMenuPage();
-    } else if (sel == 1) {
-      return const TaskListMenu(); // esta se cambia por la pantalla de tareas cuando haya
-    } else {
-      return const ProgressListMenu();
-    } /* else if (sel == 3)  { 
-      return const GeneralPage();
-    } */
   }
 }

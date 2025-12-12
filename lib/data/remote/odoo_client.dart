@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_demo/data/models/project_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_demo/env.dart';
 
@@ -21,6 +22,44 @@ class OdooClient {
   String? _sessionId;
   int? _uid;
 
+  
+  // It reuse one client so we don't have to create a new connection each time I hope this can avoid the connection closed (changuitos)
+  late final http.Client _client = IOClient(
+    HttpClient()
+       ..connectionTimeout = const Duration(seconds: 80)
+      ..idleTimeout = const Duration(seconds: 80)
+      ..autoUncompress = true,
+  );
+
+  Map<String, String> _headers({bool includeCookie = true}){
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      // 'Accept-Encoding': 'identity' // comment this line if issues with odoo conection 
+    };
+    if (includeCookie && _sessionId != null) {
+      headers['Cookie'] = 'session_id=$_sessionId';
+    }
+    return headers;
+  }
+
+  void _updateSesionFromResponse(http.Response response){
+    final cookies = response.headers['set-cookie'];
+    debugPrint(pink('Set-Cookie: $cookies'));
+
+    if (cookies == null) return;
+
+    final parts = cookies.split(';');
+    for (final part in parts) {
+      final trimmed = part.trim();
+      if (trimmed.startsWith('session_id=')) {
+        _sessionId = trimmed.substring('session_id='.length);
+        debugPrint(green('Updated session_id: $_sessionId'));
+        break;
+      }
+    }
+  }
+
 
   Future<bool> authenticate(String username, String password) async {
     try {
@@ -37,18 +76,14 @@ class OdooClient {
         }
       };
 
-      final response = await http.post(
+      final response = await _client.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Accept-Encoding': 'identity' // comment this line if issues with odoo conection 
-          },
+        headers: _headers(includeCookie: false),
         body: jsonEncode(payload),
       ).timeout(
-        const Duration(seconds: 10),
+        const Duration(seconds: 80),  
         onTimeout: () {
-          throw TimeoutException(red('Connection timeout after 10 seconds'));
+          throw TimeoutException('Request timeout after 15 seconds');
         },
       );
 
@@ -59,6 +94,8 @@ class OdooClient {
         debugPrint(red('Auth failed with status: ${response.statusCode}'));
         return false;
       }
+
+      _updateSesionFromResponse(response);
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final result = data['result'] as Map<String, dynamic>?;
@@ -78,24 +115,9 @@ class OdooClient {
 
       _uid = uid;
 
-      // Read session_id from Set-Cookie
-      final cookies = response.headers['set-cookie'];
-      debugPrint(pink('Set-Cookie: $cookies'));
-
-      if (cookies != null) {
-        final parts = cookies.split(';');
-        for (final part in parts) {
-          final trimmed = part.trim();
-          if (trimmed.startsWith('session_id=')) {
-            _sessionId = trimmed.substring('session_id='.length);
-            debugPrint(green('Saved session_id: $_sessionId'));
-            break;
-          }
-        }
-      }
-
       return true;
-    } on SocketException catch (e) {
+
+    }  on SocketException catch (e) {
       debugPrint(red('SocketException: ${e.message}'));
       debugPrint(pink('   Address: ${e.address}, Port: ${e.port}'));
       debugPrint(pink('   Check: Is Odoo server running? Is IP/port correct?'));
@@ -104,44 +126,43 @@ class OdooClient {
       debugPrint(red('TimeoutException: ${e.message}'));
       debugPrint('   The server is not responding. Check firewall/network.');
       return false;
-    } on http.ClientException catch (e) {
-      debugPrint(red('ClientException: $e'));
-      debugPrint('   Actual URL attempted: $baseUrl/web/session/authenticate');
-      return false;
-    } catch (e) {
-      debugPrint(red('Unexpected error during authentication: $e'));
+    } 
+    catch (e) {
+      debugPrint(red('Authentication error: $e'));
       return false;
     }
   }
 
   int? getUid() => _uid;
 
-  Future<List<ProjectData>> fetchProjects() async {
+   Future<List<ProjectData>> fetchProjects() async {
     final result = await callKw(
       model: 'project.project',
       method: 'search_read',
       args: [
+        [],
         [
-          ['create_uid', '=', _uid],
-        ]
+          'id',
+          'name',
+          'partner_id',
+          'company_id',
+          'user_id',
+          'supervisor',
+          'coordinador',
+          'date_start',
+          'allocated_hours'
+        ],
       ],
       kwargs: {
-        'fields': [
-          'name', 
-          'label_tasks', 
-          'partner_id', 
-          'company_id', 
-          'user_id', 
-          'supervisor', 
-          'coordinador', 
-          'date_start', 
-          'allocated_hours',
-          'state'
-          ]
+        'limit': 50,
+        'order': 'create_date desc',
       },
     );
-    
-    return List<ProjectData>.from(result as List);
+
+    final projectMaps = List<Map<String, dynamic>>.from(result as List);
+    return projectMaps
+        .map((record) => ProjectData.fromOdoo(Map<String, dynamic>.from(record)))
+        .toList(growable: false);
   }
 
 
@@ -166,22 +187,16 @@ class OdooClient {
         }
       };
 
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
-
-      if (_sessionId != null) {
-        headers['Cookie'] = 'session_id=$_sessionId';
-      } else {
+     if (_sessionId == null) {
         debugPrint(yellow('Warning: No session_id available'));
       }
 
-      final response = await http.post(
+      final response = await _client.post(
         url,
-        headers: headers,
+        headers: _headers(includeCookie: true),
         body: jsonEncode(payload),
       ).timeout(
-        const Duration(seconds: 15),
+        const Duration(seconds: 80),
         onTimeout: () {
           throw TimeoutException('Request timeout after 15 seconds');
         },
@@ -241,24 +256,26 @@ class OdooClient {
       },
     };
 
-    final headers = <String, String> {
-      'Content-Type': 'application/json',
-    };
-    if (_sessionId != null) {
-      headers['Cookie'] = 'session_id=$_sessionId';
-    } else {
+    if (_sessionId == null) {
       debugPrint(yellow('Warning: creating record WITHOUT session_id'));
     }
     
-    final res = await http.post(
+    final res = await _client.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: _headers(includeCookie: true),
       body: jsonEncode(payload),
+    ).timeout(
+      const Duration(seconds: 80),
+      onTimeout: () {
+        throw TimeoutException('Request timeout after 20 seconds');
+      },
     );
 
     if (res.statusCode != 200) {
       throw Exception('Error HTTP al crear registro: ${res.statusCode}');
     }
+
+    _updateSesionFromResponse(res);
 
     final data = jsonDecode(res.body);
 
@@ -266,7 +283,7 @@ class OdooClient {
       throw Exception('Error Odoo: ${data['error']}');
     }
 
-    // Odoo regresa el ID del nuevo registro
+    // Odoo returns the ID of the created record
     final id = data['result'];
     return id is int ? id : int.parse(id.toString());
   }

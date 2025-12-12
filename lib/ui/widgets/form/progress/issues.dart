@@ -29,7 +29,7 @@ class _IssuesPageState extends State<IssuesPage> {
   String? _responsable;
   final form = ProgressFormController.instance;
   
-  late final OdooClient _odoo;
+  final OdooClient _odoo = OdooClient.instance;
   
   static const steps = [
     StepItem(icon: Icons.info_outline, label: 'General'),
@@ -99,22 +99,14 @@ class _IssuesPageState extends State<IssuesPage> {
 
     // save in Odoo
     try {
-      //authentication
-      final loggedIn = await _odoo.authenticate('admin', 'admin');
-      if (!loggedIn) {
-        if (mounted){
-          debugPrint(pink('User\'s authentication failed'));
-        }
-      } else {
-        final values = _mapProgressToOdooValues(progress);
-        
-        if (form.isEditing){
+      final values = _mapProgressToOdooValues(progress);   
+      if (form.isEditing){
           // 
-        } else {
-          final newId = await _odoo.createRecord('creacion.avances', values);
-          debugPrint(pink('Registro creado en Odoo con ID $newId'));
-        }
+      } else {
+        final newId = await _odoo.createRecord('creacion.avances', values);
+        debugPrint(pink('Registro creado en Odoo con ID $newId'));
       }
+      
     } catch (e) {
       debugPrint(pink('Error al guardar en Odoo $e'));
       if (mounted){

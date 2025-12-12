@@ -1,5 +1,5 @@
 class Env {
-  static const String  url = 'http://192.168.68.131:8069';
+  static const String  url = 'http://192.168.68.128:8069';
   static const String db = 'odoo18';
   // static const int port = 8069;
 }

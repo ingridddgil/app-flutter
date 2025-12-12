@@ -31,7 +31,10 @@ class OdooClient {
       ..autoUncompress = true,
   );
 
-  Map<String, String> _headers({bool includeCookie = true}) {
+  Map<String, String> _headers({
+    bool includeCookie = true,
+    bool forceConnectionClose = false,
+  }) {
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -39,6 +42,9 @@ class OdooClient {
       // using identity makes responses predictable.
       'Accept-Encoding': 'identity',
     };
+    if (forceConnectionClose) {
+      headers['Connection'] = 'close';
+    }
     if (includeCookie && _sessionId != null) {
       headers['Cookie'] = 'session_id=$_sessionId';
     }
@@ -60,6 +66,100 @@ class OdooClient {
     }
   }
 
+  bool _isRetryableClose(dynamic e) {
+    final msg = e.toString().toLowerCase();
+    return msg.contains('connection closed while receiving data') ||
+        msg.contains('connection closed') ||
+        msg.contains('connection reset by peer') ||
+        msg.contains('broken pipe');
+  }
+
+  Future<http.Response> _postJson(
+    Uri url,
+    Map<String, dynamic> payload, {
+    required Duration timeout,
+    bool includeCookie = true,
+  }) async {
+    try {
+      final response = await _client
+          .post(
+            url,
+            headers: _headers(includeCookie: includeCookie),
+            body: jsonEncode(payload),
+          )
+          .timeout(timeout, onTimeout: () {
+        throw TimeoutException('Request timeout after ${timeout.inSeconds} seconds');
+      });
+
+      _updateSessionFromResponse(response);
+      return response;
+    } on http.ClientException catch (e) {
+      // If the server/proxy closes the socket mid-response, retry once with
+      // a fresh connection and Connection: close to avoid reusing a dead keep-alive.
+      if (_isRetryableClose(e)) {
+        debugPrint(yellow('Retrying request after ClientException: $e'));
+        final retryClient = IOClient(
+          HttpClient()
+            ..connectionTimeout = const Duration(seconds: 15)
+            ..idleTimeout = const Duration(seconds: 0)
+            ..autoUncompress = true,
+        );
+        try {
+          final retryResponse = await retryClient
+              .post(
+                url,
+                headers: _headers(
+                  includeCookie: includeCookie,
+                  forceConnectionClose: true,
+                ),
+                body: jsonEncode(payload),
+              )
+              .timeout(timeout, onTimeout: () {
+            throw TimeoutException(
+              'Request timeout after ${timeout.inSeconds} seconds (retry)',
+            );
+          });
+          _updateSessionFromResponse(retryResponse);
+          return retryResponse;
+        } finally {
+          retryClient.close();
+        }
+      }
+      rethrow;
+    } on SocketException catch (e) {
+      if (_isRetryableClose(e)) {
+        debugPrint(yellow('Retrying request after SocketException: ${e.message}'));
+        final retryClient = IOClient(
+          HttpClient()
+            ..connectionTimeout = const Duration(seconds: 15)
+            ..idleTimeout = const Duration(seconds: 0)
+            ..autoUncompress = true,
+        );
+        try {
+          final retryResponse = await retryClient
+              .post(
+                url,
+                headers: _headers(
+                  includeCookie: includeCookie,
+                  forceConnectionClose: true,
+                ),
+                body: jsonEncode(payload),
+              )
+              .timeout(timeout, onTimeout: () {
+            throw TimeoutException(
+              'Request timeout after ${timeout.inSeconds} seconds (retry)',
+            );
+          });
+          _updateSessionFromResponse(retryResponse);
+          return retryResponse;
+        } finally {
+          retryClient.close();
+        }
+      }
+      rethrow;
+    }
+  }
+
 
   Future<bool> authenticate(String username, String password) async {
     try {
@@ -76,15 +176,11 @@ class OdooClient {
         }
       };
 
-      final response = await _client.post(
+      final response = await _postJson(
         url,
-        headers: _headers(includeCookie: false),
-        body: jsonEncode(payload),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw TimeoutException(red('Connection timeout after 10 seconds'));
-        },
+        payload,
+        timeout: const Duration(seconds: 10),
+        includeCookie: false,
       );
 
       debugPrint(green('Auth status: ${response.statusCode}'));
@@ -94,8 +190,6 @@ class OdooClient {
         debugPrint(red('Auth failed with status: ${response.statusCode}'));
         return false;
       }
-
-      _updateSessionFromResponse(response);
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final result = data['result'] as Map<String, dynamic>?;
@@ -191,15 +285,11 @@ class OdooClient {
         debugPrint(yellow('Warning: No session_id available'));
       }
 
-      final response = await _client.post(
+      final response = await _postJson(
         url,
-        headers: _headers(includeCookie: true),
-        body: jsonEncode(payload),
-      ).timeout(
-        const Duration(seconds: 15),
-        onTimeout: () {
-          throw TimeoutException('Request timeout after 15 seconds');
-        },
+        payload,
+        timeout: const Duration(seconds: 20),
+        includeCookie: true,
       );
 
       debugPrint(green('callKw $model.$method status: ${response.statusCode}'));
@@ -208,8 +298,6 @@ class OdooClient {
       if (response.statusCode != 200) {
         throw Exception(red('HTTP error ${response.statusCode}'));
       }
-
-      _updateSessionFromResponse(response);
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
@@ -262,22 +350,16 @@ class OdooClient {
       debugPrint(yellow('Warning: creating record WITHOUT session_id'));
     }
     
-    final res = await _client.post(
+    final res = await _postJson(
       url,
-      headers: _headers(includeCookie: true),
-      body: jsonEncode(payload),
-    ).timeout(
-      const Duration(seconds: 20),
-      onTimeout: () {
-        throw TimeoutException('Request timeout after 20 seconds');
-      },
+      payload,
+      timeout: const Duration(seconds: 30),
+      includeCookie: true,
     );
 
     if (res.statusCode != 200) {
       throw Exception('Error HTTP al crear registro: ${res.statusCode}');
     }
-
-    _updateSessionFromResponse(res);
 
     final data = jsonDecode(res.body);
 
